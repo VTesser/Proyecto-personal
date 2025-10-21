@@ -36,10 +36,10 @@ Finalmente, el proyecto avanza hacia la fase de análisis y visualización, dond
 En cada etapa, el código está acompañado de comentarios explicativos y observaciones sobre los resultados intermedios, con el fin de que el lector no solo vea qué se hace, sino también por qué se hace. De este modo, el proyecto funciona tanto como un ejercicio práctico de análisis de datos en R como una guía para quienes quieran iniciarse en la exploración de datasets reales.
 
 El repositorio está estructurado de la siguiente manera:
-- **Data/**: Carpeta que contiene los archivos originales del dataset Goodbooks-10k en formato CSV.
-- **Scripts/**: Carpeta con los scripts de R utilizados para la limpieza, integración y  análisis de los datos.
-- **Data Limpia/**: Carpeta donde se guardan las bases de datos ya limpias y listas para el análisis.
-- **Outputs/**: Carpeta donde se guardan las visualizaciones y resultados generados durante el análisis.
+- **Data**: Carpeta que contiene los archivos originales del dataset Goodbooks-10k en formato CSV.
+- **Scripts**: Carpeta con los scripts de R utilizados para la limpieza, integración y  análisis de los datos.
+- **Data Limpia**: Carpeta donde se guardan las bases de datos ya limpias y listas para el análisis.
+- **Outputs**: Carpeta donde se guardan las visualizaciones y resultados generados durante el análisis.
 - **README.md**: Este archivo, que proporciona una visión general del proyecto y su estructura
 
 
