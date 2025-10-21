@@ -1,6 +1,4 @@
-
-
-#Explorando el dataset Goodbooks-10k 📚
+# Explorando el dataset Goodbooks-10k 📚
 
 - Autor: Valentina Tesser
 - Fecha: 23 de octubre de 2025
