@@ -42,5 +42,46 @@ El repositorio está estructurado de la siguiente manera:
 - **Outputs**: Carpeta donde se guardan las visualizaciones y resultados generados durante el análisis.
 - **README.md**: Este archivo, que proporciona una visión general del proyecto y su estructura
 
+## 3. Requisitos para reproducir el análisis
+
+Para reproducir el análisis presentado en este proyecto, necesitarás tener instalado R y RStudio en tu computadora. Además, es importante contar con las siguientes librerías del ecosistema tidyverse, que facilitan la manipulación y visualización de datos:
+- tidyverse
+- dplyr
+- ggplot2
+- readr
+- tidyr
+- summarytools
+
+
+## 4. Base de datos
+
+**Goodbooks-10k dataset**: El dataset Goodbooks-10k es una colección de datos que contiene información sobre más de 10,000 libros, sus autores, calificaciones y etiquetas (tags) asociadas. Este conjunto de datos es ideal para realizar análisis exploratorios y visualizaciones relacionadas con la popularidad y características de los libros.
+
+El dataset incluye los siguientes archivos principales:
+
+- books.csv: Este archivo contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
+- books.tags.csv: Este archivo contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
+- ratings.csv: Este archivo contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
+- tags.csv: Este archivo contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
+- to_read.csv: Este archivo contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
+
+Puedes descargar el dataset completo desde Kaggle en el siguiente enlace: https://www.kaggle.com/datasets/zygmunt/goodbooks-10k. Asegúrate de guardar los archivos CSV en la carpeta "Data" del repositorio para que los scripts puedan acceder a ellos correctamente.
+
+## 5. Pasos a seguir
+
+Para reproducir el análisis presentado en este proyecto, sigue estos pasos:
+1. Clona o descarga este repositorio en tu computadora.
+2. Asegúrate de tener R y RStudio instalados.
+3. Instala las librerías necesarias si aún no las tienes:
+```R
+install.packages(c("tidyverse", "dplyr", "ggplot2", "readr", "tidyr", "summarytools"))
+```
+4. Coloca los archivos CSV del dataset Goodbooks-10k en la carpeta "Data" del repositorio.
+5. Abre RStudio y carga los scripts de R desde la carpeta "Scripts" en el orden indicado (limpieza, integración, análisis).
+6. Ejecuta los scripts paso a paso, asegurándote de entender cada sección del código y los comentarios explicativos.
+7. Revisa los resultados y visualizaciones generados en la carpeta "Outputs".
+
+Siguiendo estos pasos, podrás reproducir el análisis y explorar los datos por ti mismo. No dudes en modificar el código para adaptarlo a tus propias preguntas de investigación o intereses literarios. ¡Feliz análisis de datos! 📊📚
+
 
 
