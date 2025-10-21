@@ -1,0 +1,215 @@
+---
+title: "Fase 2 - Proyecto personal"
+author: "Valentina Tesser"
+date: "2025-10-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Fase 2 - Integración de bases limpias de Goodreads
+
+Objetivo: Integrar las bases limpias de Goodreads
+
+Esta etapa prepara la base final para análisis exploratorio
+
+
+# 1. Librerias
+
+```{r}
+library(dplyr)
+library(readr)
+library(tidyr)
+```
+
+# 2. Cargar las bases limpias
+
+Se cargan las cinco bases principales obtenidas y limpiadas previamente:
+
+- books: metadatos de los libros
+- book_tags: relación libro-tag con frecuencia
+- tags: nombres de los tags
+- ratings: calificaciones individuales de los usuarios
+- o_read: libros marcados "por leer" por usuarios (opcional)
+ 
+```{r}
+book_tags <- read_csv("Data Limpia/book_tags_clean.csv")
+
+books <- read_csv("Data Limpia/books_clean.csv")
+
+ratings <- read_csv("Data Limpia/ratings_clean.csv")
+
+tags <- read_csv("Data Limpia/tags_clean.csv")
+
+# Opcional (por si se usa en análisis complementario)
+
+to_read <- read_csv("Data Limpia/to_read_clean.csv")
+
+```
+
+# 3. Estandarizar nombres de columnas (IDs)
+
+Para facilitar los joins, se renombra la columna de identificador de libros en books y book_tags como book_id
+
+
+```{r}
+
+# Verificar nombres
+colnames(books)
+colnames(book_tags)
+colnames(ratings)
+colnames(tags)
+
+# Renombrar columnas de libros
+books <- books %>%
+  rename(book_id = goodreads_book_id)
+
+book_tags <- book_tags %>%
+  rename(book_id = goodreads_book_id)
+
+# Verificar nombres
+colnames(books)
+colnames(book_tags)
+colnames(ratings)
+colnames(tags)
+
+```
+
+# 4. Verificación rápida 
+
+```{r}
+# Comprobamos que las columnas existan y el número de libros únicos
+colnames(books)
+colnames(book_tags)
+colnames(tags)
+colnames(ratings)
+
+length(unique(books$book_id))       # libros únicos en books
+length(unique(book_tags$book_id))   # libros únicos en book_tags
+length(unique(ratings$book_id))     # libros únicos en ratings
+
+# Observación: books tiene 8130 libros, mientras que book_tags y ratings tienen 10000
+# Esto es normal, algunas bases incluyen libros adicionales que no están en la base principal
+```
+
+
+# 5. Unir book_tags con tags (para obtener nombres de géneros)
+
+```{r}
+# Objetivo: obtener el nombre del tag para cada registro de book_tags
+
+book_tags_joined <- book_tags %>%
+  left_join(tags, by = "tag_id")
+
+# Vista previa
+head(book_tags_joined)
+
+```
+
+
+# 6. Seleccionar el tag principal por libro
+
+```{r}
+# Cada libro puede tener múltiples tags; seleccionamos el más frecuente (mayor count)
+
+top_tags_per_book <- book_tags_joined %>%
+  group_by(book_id) %>%
+  arrange(desc(count)) %>%
+  slice_head(n = 1) %>%  # se queda con el tag más relevante
+  ungroup() %>%
+  select(book_id, tag_name)
+
+```
+
+# 7. Unir tags a la base principal de libros
+
+
+```{r}
+# Ahora cada libro tiene su género principal (tag_name)
+books_genres <- books %>%
+  left_join(top_tags_per_book, by = "book_id")
+
+# Comprobación: cuántos libros tienen tag asignado
+table(is.na(books_genres$tag_name))
+
+# Observación :FALSE 8130, esto significa que todos los libros en books tienen un tag asignado
+
+```
+
+# 8. Resumen de ratings por libro
+
+```{r}
+# Calculamos promedio y número de ratings por libro
+ratings_summary <- ratings %>%
+  group_by(book_id) %>%
+  summarise(
+    avg_rating = mean(rating),
+    n_ratings = n()
+  )
+
+# Verificar duplicados en resumen
+sum(duplicated(ratings_summary$book_id))  # Debe ser 0 (si lo es)
+```
+
+# 9. Unir ratings agregados a la base principal
+
+```{r}
+books_full <- books_genres %>%
+  left_join(ratings_summary, by = "book_id")
+
+```
+
+# 10. Incorporar "to_read" como indicador de interés
+
+```{r}
+#Calculamos cuántos usuarios marcaron cada libro como "por leer"
+
+to_read_count <- to_read %>%
+  group_by(book_id) %>%
+  summarise(n_to_read = n())
+
+books_full <- books_full %>%
+  left_join(to_read_count, by = "book_id")
+```
+
+
+# 11. Verificación final de la base
+
+```{r}
+dim(books_full)       # filas (8130) y columnas (15)
+colnames(books_full)  # columnas disponibles
+
+# Revisar NAs por columna
+sapply(books_full, function(x) sum(is.na(x)))
+
+# Observaciones:
+# - La base contiene todos los libros de la base principal
+# - Tag_name será NA si no se encontró tag
+# - avg_rating y n_ratings serán NA si el libro no tiene ratings
+# - n_to_read será NA si el libro no fue marcado por ningún usuario
+# - NA = avg_rating = 7474, n_ratings = 7474, n_to_read = 7475
+
+```
+
+
+# 12. Guardar base final integrada
+
+```{r}
+write_csv(books_full, "Data Limpia/books_final_integrated.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

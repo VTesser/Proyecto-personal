@@ -1,0 +1,55 @@
+---
+title: "Fase 3 - Proyecto personal"
+author: "Valentina Tesser"
+date: "2025-10-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Fase 3 - Exploración descriptiva de datos de Goodreads
+
+# Librerías necesarias
+
+```{r}
+library(dplyr)
+library(readr)
+library(ggplot2)
+```
+
+
+# Cargar la base integrada
+
+Esta base contiene todos los libros limpios y preparados para análisis, con las siguientes variables:
+
+- book_id: identificador único de cada libro
+- authors: nombre del/los autor(es)
+- original_publication_year: año de publicación original
+- title / original_title: título del libro
+- language_code: idioma
+- average_rating: promedio de ratings de Goodreads
+- ratings_count: número de calificaciones
+- work_text_reviews_count: número de reseñas textuales
+- tag_name: género principal (seleccionado a partir de los tags)
+- avg_rating / n_ratings: promedio y cantidad de ratings agregados
+- n_to_read: número de usuarios que marcaron el libro como "por leer"
+
+```{r}
+books_full <- read_csv("Data Limpia/books_final_integrated.csv")
+
+
+# Vista previa de la base
+head(books_full)
+dim(books_full)
+colnames(books_full)
+
+# Revisar valores NA por columna
+sapply(books_full, function(x) sum(is.na(x)))
+
+# Observación: avg_rating contine 7474 NA, n_ratings contiene 7474 NA, n_to_read contine 7475 NA.  
+
+```
+
+

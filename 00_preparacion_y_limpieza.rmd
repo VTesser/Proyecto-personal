@@ -1,0 +1,347 @@
+---
+title: "Fase 1-Proyecto personal"
+author: "Valentina Tesser"
+date: "2025-10-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Exploracion de base de datos para pryecto personal de Datos Magister. La idea de la investigacion es sacar datos de GOODREADS y analizar los libros mas populares por genero, autor, año, etc. 
+
+Pregunta de investigacion central: ¿Cuales son los libros mas populares en GOODREADS y que patrones se pueden identificar en terminos de genero, autor y año de publicacion?
+
+Segunda pregunta de investigación: ¿Cómo varian las calificaciones y reseñas de los libros segun su genero y autor?
+
+Tercera pregunta de investigación: ¿Existe alguna correlacion entre el año de publicacion y la popularidad de los libros en GOODREADS?
+
+Cuarta pregunta de investigacion: ¿Cuales son los autores mas populares en GOODREADS y que caracteristicas comparten sus obras?
+
+#Librerias 
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(dplyr)
+library(summarytools)
+```
+
+
+
+#Base de datos
+
+Goodbooks-10k dataset
+
+Books.csv: Este archivo contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
+
+books.tags.csv: Este archivo contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
+
+ratings.csv: Este archivo contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
+
+tags.csv: Este archivo contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
+
+to_read.csv: Este archivo contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
+
+```{r}
+#Importar datos
+
+books <- read_csv("Base datos en bruto/books.csv")
+View(books)
+
+book_tags <- read_csv("Base datos en bruto/book_tags.csv")
+View(book_tags)
+
+ratings <- read_csv("Base datos en bruto/ratings.csv")
+View(ratings)
+
+tags <- read_csv("Base datos en bruto/tags.csv")
+View(tags)
+
+to_read <- read_csv("Base datos en bruto/to_read.csv")
+View(to_read)
+
+```
+
+
+#Exploración de base de datos
+
+```{r}
+# ---- books.csv ----
+glimpse(books)      # Ver tipos de variables y primeras filas
+summary(books)      # Resumen estadístico de variables numéricas
+colnames(books)     # Listado de columnas
+dim(books)          # Número de filas y columnas
+
+# ---- ratings.csv ----
+glimpse(ratings)
+summary(ratings)
+dim(ratings)
+
+# ---- tags.csv ----
+glimpse(tags)
+summary(tags)
+dim(tags)
+
+# ---- book_tags.csv ----
+glimpse(book_tags)
+summary(book_tags)
+dim(book_tags)
+
+# ---- to_read.csv ----
+glimpse(to_read)
+summary(to_read)
+dim(to_read)
+```
+
+
+#Explorar rango temporal de los libros
+
+Apuntes: 
+
+- Base va del año -1750 hasta 2017
+- Hay 21 NA (cuando se hace el cruce respecto a la distribucion de libros por año)
+
+```{r}
+# Año de publicación mínimo y máximo
+range(books$original_publication_year, na.rm = TRUE)
+
+# Distribución de libros por año
+books %>%
+  group_by(original_publication_year) %>%
+  summarise(n_libros = n()) %>%
+  arrange(original_publication_year) %>%
+  print(n=30)   # Muestra hasta 30 años consecutivos
+```
+
+# Revisar valores nulos y duplicados
+
+Apuntes
+
+- se presentan NA en la base de datos books (en original_publication_year, isbn, isbn13, language_code, original_title)
+- En book_tags hay 6 filas duplicadas (revisar)
+
+
+```{r}
+# Valores NA por columna
+sapply(books, function(x) sum(is.na(x)))
+sapply(ratings, function(x) sum(is.na(x)))
+sapply(tags, function(x) sum(is.na(x)))
+sapply(book_tags, function(x) sum(is.na(x)))
+sapply(to_read, function(x) sum(is.na(x)))
+
+# Revisar duplicados
+sum(duplicated(books$goodreads_book_id))
+sum(duplicated(books))        # Duplicados exactos
+sum(duplicated(ratings)) # Duplicados exactos
+sum(duplicated(tags)) 
+sum(duplicated(book_tags))   # 6 duplicados (revisar)  
+sum(duplicated(to_read))
+
+```
+
+#Revisar valores únicos importantes
+
+```{r}
+# Número de autores únicos = 4664
+length(unique(books$authors))
+
+# Número de libros únicos = 10000
+length(unique(books$goodreads_book_id))
+
+# Número de etiquetas únicas = 34252
+length(unique(tags$tag_name)) 
+
+# Número de etiquetas únicas = 34252
+length(unique(book_tags$tag_id))
+```
+
+# Exploración inicial de popularidad
+
+```{r}
+# Libros con más ratings
+books %>%
+  arrange(desc(ratings_count)) %>%
+  select(title, authors, ratings_count) %>%
+  head(10)
+
+# Libros con mayor promedio de rating (con al menos 50 ratings para filtrar outliers)
+books %>%
+  filter(ratings_count >= 50) %>%
+  arrange(desc(average_rating)) %>%
+  select(title, authors, average_rating, ratings_count) %>%
+  head(10)
+```
+
+# Exploración de géneros
+
+```{r}
+# Combinar book_tags y tags para ver los géneros más frecuentes
+book_genres <- book_tags %>%
+  left_join(tags, by = "tag_id")
+
+# Top 10 géneros
+book_genres %>%
+  count(tag_name, sort = TRUE) %>%
+  head(10)
+
+```
+
+#Exploración de “to_read” (libros por leer)
+
+```{r}
+# Número de libros marcados "por leer" por usuario
+to_read %>%
+  group_by(user_id) %>%
+  summarise(libros_por_leer = n()) %>%
+  summary()
+
+# Libros más marcados "por leer"
+to_read %>%
+  group_by(book_id) %>%
+  summarise(veces_por_leer = n()) %>%
+  arrange(desc(veces_por_leer)) %>%
+  left_join(books, by=c("book_id"="goodreads_book_id")) %>%
+  select(title, authors, veces_por_leer) %>%
+  head(10)
+
+```
+
+
+
+## Limpieza de bases de datos
+
+# 1. Filtrar años válidos (1800–2017)
+
+Apuntes:
+
+- La base incluye valores fuera de rango (años negativos o extremadamente antiguos).
+- Goodreads no tiene registros significativos antes de 1800, según la investigación previa
+- Se filtran los años entre 1800 y 2017 (rango realista según datos observados).
+- Se eliminan también los registros con año faltante (NA).
+
+```{r}
+books <- books %>%
+  filter(!is.na(original_publication_year)) %>%
+  filter(original_publication_year >= 1800 & original_publication_year <= 2017)
+
+```
+
+
+# 2. Eliminar duplicados exactos
+
+Apuntes:
+
+- Se identificaron 6 duplicados en book_tags.
+- No se encontraron duplicados en books ni ratings.
+- Se eliminan los duplicados en todas las bases por seguridad.
+
+```{r}
+books <- books %>% distinct()
+ratings <- ratings %>% distinct()
+tags <- tags %>% distinct()
+book_tags <- book_tags %>% distinct()
+to_read <- to_read %>% distinct()
+```
+
+#3. Eliminar valores faltantes críticos
+
+Apuntes:
+
+- Se eliminan registros sin título u año, pues son necesarios para cualquier análisis posterior.
+- Se mantiene ISBN aunque falte (no afecta análisis descriptivo).
+- Se mantiene language_code por ahora para revisión posterior.
+
+```{r}
+books <- books %>%
+  filter(!is.na(original_title), !is.na(original_publication_year))
+```
+
+#4. Revisar idiomas más frecuentes
+
+Apuntes:
+
+- Permite observar la distribución de los libros por idioma.
+- Si se busca evitar sesgos lingüísticos, puede filtrarse a inglés o español.
+- Goodreads tiene mayoría de registros en inglés (eng).
+
+```{r}
+table(books$language_code)
+
+# Filtrar libros en inglés
+books <- books %>%
+  filter(language_code %in% c("en", "en-CA", "en-GB", "en-US", "eng"))
+
+# Homogeneizar etiqueta de idioma
+books$language_code <- "English"
+
+# Verificar resultado
+table(books$language_code)
+
+```
+
+
+# Selección de variables por base
+
+```{r}
+
+#1.Books
+
+colnames(books)
+
+books_clean <- books %>%
+  select(
+    goodreads_book_id,
+    best_book_id,
+    work_id,
+    authors,
+    original_publication_year,
+    original_title,
+    title,
+    language_code,
+    average_rating,
+    ratings_count,
+    work_text_reviews_count
+  )
+
+
+#2. books_tags
+
+book_tags_clean <- book_tags %>%
+  select(goodreads_book_id, tag_id, count)
+
+
+# 3. tags
+tags_clean <- tags %>%
+  select(tag_id, tag_name)
+
+
+# 4. ratings
+
+ratings_clean <- ratings %>%
+  select(book_id, rating)
+
+# 5. to_read
+
+to_read_clean <- to_read %>%
+  select(user_id, book_id)
+
+```
+
+
+# Guardar bases limpias
+
+```{r}
+write.csv(books_clean, "books_clean.csv", row.names = FALSE)
+write.csv(book_tags_clean, "book_tags_clean.csv", row.names = FALSE)
+write.csv(tags_clean, "tags_clean.csv", row.names = FALSE)
+write.csv(ratings_clean, "ratings_clean.csv", row.names = FALSE)
+write.csv(to_read_clean, "to_read_clean.csv", row.names = FALSE)
+```
+
+
+
+
