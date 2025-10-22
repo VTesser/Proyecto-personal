@@ -92,7 +92,7 @@ Una de las preguntas más interesantes que surgen al analizar el dataset *Goodbo
 En otras palabras, buscamos saber si los libros más populares (aquellos con más calificaciones o reseñas) son también los mejor evaluados.  
 Esta pregunta nos permite acercarnos a la dinámica de comportamiento lector dentro de Goodreads: ¿la visibilidad impulsa la valoración positiva, o los usuarios prefieren calificar mejor obras menos masivas?
 
-### 🧹 Limpieza y observaciones iniciales
+### Limpieza y observaciones iniciales
 
 Antes de comenzar con los gráficos, revisé la estructura de las variables principales del análisis:  
 
@@ -107,7 +107,7 @@ y `n_to_read` contiene **7475 valores NA**.
 
 Estos *NA* corresponden a **libros que no han recibido calificaciones ni han sido marcados como “por leer”**. Por lo tanto, en los gráficos siguientes se trabajará solo con los registros completos, utilizando `filter(!is.na(avg_rating))` y `filter(!is.na(n_ratings))` para asegurar que los resultados sean representativos.
 
-### 🎯 Objetivo analítico
+### Objetivo analítico
 
 El objetivo de esta sección es identificar si existe una relación (lineal o no) entre la *valoración promedio* y la *popularidad* de los libros en Goodreads. Para ello, exploraremos visualmente los datos y luego cuantificaremos la correlación entre ambas variables.
 
@@ -249,6 +249,8 @@ Este patrón evidencia que el interés masivo por ciertos títulos —probableme
 En resumen, la relación entre popularidad y valoración es compleja: los libros más leídos y comentados no necesariamente son los más apreciados, lo que refleja la diversidad de gustos y expectativas dentro de la comunidad lectora de Goodreads.
 
 ### Conclusión: Valoración vs. Popularidad
+
+**¿Qué relación existe entre la valoración promedio de un libro y su nivel de popularidad entre los usuarios?**
 
 El análisis revela que la relación entre la valoración promedio de un libro y su nivel de popularidad en Goodreads no es lineal ni directa. Si bien existe una tendencia general a que los libros con calificaciones más altas atraigan más lectores y reseñas, los datos muestran una amplia dispersión: muchos títulos con valoraciones promedio sobresalientes (por encima de 4.3) no alcanzan altos niveles de popularidad, mientras que otros con puntuaciones más moderadas acumulan miles de valoraciones.
 
