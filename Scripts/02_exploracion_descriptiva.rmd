@@ -37,8 +37,7 @@ Esta base contiene todos los libros limpios y preparados para análisis, con las
 - n_to_read: número de usuarios que marcaron el libro como "por leer"
 
 ```{r}
-books_full <- read_csv("Data Limpia/books_final_integrated.csv")
-
+books_full <- read_csv("~/Desktop/Universidad 2025/Datos magister/Proyecto personal/Data Limpia/books_final_integrated.csv")
 
 # Vista previa de la base
 head(books_full)
@@ -48,7 +47,118 @@ colnames(books_full)
 # Revisar valores NA por columna
 sapply(books_full, function(x) sum(is.na(x)))
 
-# Observación: avg_rating contine 7474 NA, n_ratings contiene 7474 NA, n_to_read contine 7475 NA.  
+# Observación: avg_rating contine 7474 NA, n_ratings contiene 7474 NA, n_to_read contine 7475 NA. Estos NA corresponden a libros sin calificaciones o sin usuarios que los marcaron como "por leer".
+```
+
+
+# PRUEBA
+
+```{r}
+# Instalar paquetes si no están
+pkgs <- c("tidyverse","ggrepel","scales","viridis","ggridges","patchwork",
+          "treemapify","wordcloud2","plotly","showtext","ggtext")
+install_if_missing <- function(p) if(!p %in% installed.packages()) install.packages(p)
+invisible(sapply(pkgs, install_if_missing))
+```
+
+
+Librerias que ocuparemos en las visualizaciones:
+
+```{r}
+# Cargar librerías
+library(tidyverse)
+library(ggrepel)
+library(scales)
+library(viridis)
+library(ggridges)
+library(patchwork)
+library(treemapify)
+library(wordcloud2)
+library(plotly)
+library(showtext)
+library(ggtext)
+
+
+# Opcional: fuentes bonitas para hacer gráficos más "extravagantes"
+font_add_google("Montserrat", "mont")
+showtext_auto()
+
+```
+
+
+## Asegurar tipos y crear variables útiles
+
+```{r}
+
+books_full_1 <- books_full %>%
+  mutate(
+    avg_rating = coalesce(avg_rating, average_rating),
+    n_ratings = coalesce(n_ratings, ratings_count),
+    n_to_read = replace_na(n_to_read, 0),
+    tag_name = replace_na(tag_name, "NoTag")
+  )
+
+# Revisar valores NA por columna
+sapply(books_full_1, function(x) sum(is.na(x)))
+
+```
+
+
+
+
+# Análisis descriptivo
+
+1. Scatter “popularidad vs valoración” — gráfico principal (con escala log, etiquetas y enfoque en top tags)
+
+Objetivo: ver si los libros más populares (muchos ratings) tienden a tener mejor promedio y qué géneros aparecen.
+
+```{r}
+# Preparar top tags para colorear (top 12)
+top_tags <- books_full_1 %>%
+  count(tag_name, sort = TRUE) %>%
+  slice_head(n = 12) %>%
+  pull(tag_name)
+
+plot1_data <- books_full_1 %>%
+  filter(!is.na(avg_rating)) %>%
+  mutate(tag_top = ifelse(tag_name %in% top_tags, tag_name, "Other")) %>%
+  arrange(desc(ratings_count))
+
+# Etiquetar los 15 libros más extremos (por n_to_read * ratings_count)
+labels <- plot1_data %>%
+  mutate(score = n_to_read * (ratings_count+1)) %>%
+  slice_max(order_by = score, n = 15)
+
+p1 <- ggplot(plot1_data, aes(x = avg_rating, y = ratings_count+1, color = tag_top, size = n_to_read+1, alpha = n_to_read+1)) +
+  geom_jitter(width = 0.05, height = 0, shape = 21, stroke = 0.2) +
+  scale_y_log10(labels = label_number(scale_cut = cut_short_scale())) +  # <-- CORREGIDO
+  scale_size_continuous(range = c(1,10), guide = "legend") +
+  scale_alpha(range = c(0.4, 1), guide = "none") +
+  scale_color_viridis_d(option = "C") +
+  geom_text_repel(
+    data = labels, 
+    aes(label = str_wrap(title, 20)), 
+    size = 3, 
+    max.overlaps = 10, 
+    box.padding = 0.6
+  ) +
+  labs(
+    title = "Popularidad vs Valoración promedio (Goodreads)",
+    subtitle = "Eje y en escala log; tamaño = cantidad que lo marcaron 'por leer'",
+    x = "Valoración promedio",
+    y = "Número de ratings (log10)",
+    color = "Género (top)",
+    size = "Usuarios 'por leer'"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 10)
+  )
+
+# Guardar
+ggsave("Outputs/01_popularity_vs_rating.png", p1, width = 14, height = 8, dpi = 300)
+p1
 
 ```
 

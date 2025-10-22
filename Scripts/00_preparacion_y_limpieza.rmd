@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-Exploracion de base de datos para pryecto personal de Datos Magister. La idea de la investigacion es sacar datos de GOODREADS y analizar los libros mas populares por genero, autor, año, etc. 
+Exploración de base de datos para proyecto personal de Datos Magister. La idea de la investigación es sacar datos de GOODREADS y analizar los libros mas populares por genero, autor, año, etc. 
 
 Pregunta de investigacion central: ¿Cuales son los libros mas populares en GOODREADS y que patrones se pueden identificar en terminos de genero, autor y año de publicacion?
 
