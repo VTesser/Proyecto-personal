@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = getwd())
 ```
 
 # Fase 3 - Exploración descriptiva de datos de Goodreads
@@ -96,6 +96,107 @@ En cuanto a las valoraciones promedio (avg_rating), la mayoría de los libros se
 También se pueden notar algunos valores atípicos —libros con muchas valoraciones pero calificaciones más bajas, o al contrario, libros con muy pocas valoraciones pero con promedios cercanos a 5 estrellas—. Esto puede deberse a fenómenos distintos: los primeros suelen ser títulos muy conocidos pero polarizantes (por ejemplo, sagas populares o libros con adaptaciones cinematográficas), mientras que los segundos suelen ser libros de nicho, leídos por pocos usuarios pero muy apreciados por ellos.
 
 En síntesis, la concentración de puntos muestra que la mayoría de los libros tiene una recepción positiva pero una visibilidad limitada, y que la popularidad extrema es la excepción.
+
+
+## Otras opciones de grafico 
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+books_clean <- books_full %>%
+  filter(!is.na(avg_rating), !is.na(n_ratings))
+
+ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
+  geom_point(aes(color = avg_rating), alpha = 0.6, size = 2) +
+  scale_color_gradient(low = "#FF7F0E", high = "#1F77B4") +
+  scale_x_log10(labels = comma) +
+  labs(
+    title = "Popularidad vs Valoración Promedio de Libros en Goodreads",
+    subtitle = "Cada punto representa un libro",
+    x = "Número de valoraciones (escala logarítmica)",
+    y = "Valoración promedio",
+    color = "Valoración promedio",
+    caption = "Fuente: Goodbooks-10k (Kaggle)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    legend.position = "right"
+  )
+
+```
+
+
+
+```{r}
+library(plotly)
+
+p <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating,
+                             text = paste("Título:", title,
+                                          "<br>Autor:", authors,
+                                          "<br>Valoración promedio:", avg_rating,
+                                          "<br>Número de valoraciones:", n_ratings))) +
+  geom_point(aes(color = avg_rating), alpha = 0.6, size = 2) +
+  scale_color_gradient(low = "#FF7F0E", high = "#1F77B4") +
+  scale_x_log10(labels = comma) +
+  labs(
+    title = "Popularidad vs Valoración Promedio de Libros en Goodreads",
+    x = "Número de valoraciones (escala logarítmica)",
+    y = "Valoración promedio",
+    color = "Valoración promedio"
+  ) +
+  theme_minimal(base_size = 14)
+
+ggplotly(p, tooltip = "text")
+
+
+
+```
+
+
+```{r}
+library(plotly)
+library(ggplot2)
+library(dplyr)
+library(scales)
+library(htmlwidgets)
+
+p <- ggplot(books_clean, aes(
+  x = n_ratings,
+  y = avg_rating,
+  text = paste(
+    "Título:", title,
+    "<br>Autor:", authors,
+    "<br>Valoración promedio:", round(avg_rating, 1),
+    "<br>Número de valoraciones:", n_ratings
+  )
+)) +
+  geom_point(aes(color = avg_rating), alpha = 0.6, size = 2) +
+  scale_color_gradient(low = "#1ABC9C", high = "#E91E63") +
+  scale_x_log10(labels = scales::comma) +
+  labs(
+    title = "Popularidad vs Valoración Promedio de Libros en Goodreads",
+    x = "Número de valoraciones (escala logarítmica)",
+    y = "Valoración promedio",
+    color = "Valoración promedio",
+    caption = "Fuente: Goodbooks-10k (Kaggle). Visualización: Valentina Tesser"
+  ) +
+  theme_minimal(base_size = 14)
+
+# Convertir a objeto plotly
+ggplotly_p <- ggplotly(p, tooltip = "text")
+
+# Guardar como archivo HTML
+saveWidget(ggplotly_p, "../Outputs/grafico_libros_interactivo.html", selfcontained = TRUE)
+
+
+
+```
+
+
 
 # 2. Densidad bivariada: concentración de libros
 
@@ -194,8 +295,7 @@ grafico_top15 <- ggplot(top_books, aes(y = title_wrapped, x = n_ratings_plot, co
   coord_cartesian(clip = "off")
 
 # Guardar el gráfico en tu carpeta del proyecto
-ggsave("~/Desktop/Universidad 2025/Datos magister/Proyecto personal/Outputs/grafico_top15_populares.png", grafico_top15, width = 12, height = 8, dpi = 300)
-
+ggsave("../Outputs/grafico_top15_populares.png", grafico_top15, width = 12, height = 8, dpi = 300)
 
 ```
 
