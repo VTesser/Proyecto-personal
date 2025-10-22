@@ -238,7 +238,14 @@ grafico_top15 <- ggplot(top_books, aes(y = title_wrapped, x = n_ratings_plot, co
 
 # Guardar el gráfico en tu carpeta del proyecto
 ggsave("~/Desktop/Universidad 2025/Datos magister/Proyecto personal/Outputs/grafico_top15_populares.png", grafico_top15, width = 12, height = 8, dpi = 300)
+
+png("Outputs/grafico_top15_populares.png", width = 800, height = 600)
+plot(mtcars$mpg, mtcars$hp)  # Aquí tu código de gráfico
+dev.off()
+
 ```
+
+![Top 15 libros más populares](Outputs/grafico_top15_populares.png)
 
 El gráfico muestra los 15 libros con mayor número de valoraciones en Goodreads, utilizando una escala logarítmica para representar la cantidad de calificaciones que cada título ha recibido. El color de los puntos indica la valoración promedio otorgada por los usuarios, permitiendo comparar simultáneamente popularidad y nivel de aprobación.
 
@@ -255,12 +262,6 @@ En resumen, la relación entre popularidad y valoración es compleja: los libros
 El análisis revela que la relación entre la valoración promedio de un libro y su nivel de popularidad en Goodreads no es lineal ni directa. Si bien existe una tendencia general a que los libros con calificaciones más altas atraigan más lectores y reseñas, los datos muestran una amplia dispersión: muchos títulos con valoraciones promedio sobresalientes (por encima de 4.3) no alcanzan altos niveles de popularidad, mientras que otros con puntuaciones más moderadas acumulan miles de valoraciones.
 
 Esto sugiere que la popularidad de un libro depende de múltiples factores más allá de su calidad percibida, como la visibilidad del autor, la estrategia editorial, la adaptación audiovisual o la presencia en comunidades de lectura. En resumen, una buena calificación puede ayudar, pero no garantiza el éxito masivo; el interés de los usuarios parece responder tanto a tendencias culturales como a recomendaciones externas, más que únicamente al promedio de estrellas.
-
-
-
-
-
-
 
 
 
