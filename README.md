@@ -189,8 +189,9 @@ ggplotly_p <- ggplotly(p, tooltip = "text")
 saveWidget(ggplotly_p, "../Outputs/grafico_libros_interactivo.html", selfcontained = TRUE)
 
 ```
+![Vista previa del gráfico](Outputs/grafico_libros_preview.png)
 
-[Ver gráfico interactivo](https://vtesser.github.io/Proyecto-personal/Outputs/grafico_libros_interactivo.html)
+Ademas se puede ver el gráfico interactivo: [Ver gráfico interactivo](https://vtesser.github.io/Proyecto-personal/Outputs/grafico_libros_interactivo.html)
 
 Donde observamos la misma tendencia que en el gráfico anterior, pero con la ventaja de poder explorar cada punto individualmente al pasar el cursor sobre ellos. Esto permite identificar títulos específicos, sus autores y detalles de valoración y popularidad.
 
