@@ -26,15 +26,15 @@ En definitiva, este análisis busca demostrar cómo los datos pueden convertirse
 
 ## 2. Estructura del proyecto
 
-Este proyecto se organiza en distintas fases que reflejan el flujo típico de un análisis de datos en R, desde la obtención de la información hasta la comunicación de los resultados. La idea es que cualquier persona que lea este repositorio pueda seguir el proceso paso a paso, entender la lógica detrás de cada decisión y adaptar el código a sus propios intereses.
+EEste proyecto se organiza en distintas **fases** que reflejan el flujo típico de un **análisis de datos en R**, desde la **obtención de la información** hasta la **comunicación de los resultados**. La idea es que cualquier persona que lea este repositorio pueda **seguir el proceso paso a paso**, **entender la lógica** detrás de cada decisión y **adaptar el código** a sus propios intereses.
 
-En la primera etapa, trabajé con los archivos originales del dataset Goodbooks-10k, que incluyen información de libros, autores, etiquetas (tags), valoraciones de usuarios y libros marcados como por leer. Estos archivos fueron cargados y explorados para identificar su estructura, variables y posibles problemas de calidad, como valores faltantes o duplicados.
+En la primera etapa, trabajé con los **archivos originales del dataset Goodbooks-10k**, que incluyen información de **libros, autores, etiquetas (tags), valoraciones de usuarios** y **libros marcados como por leer**. Estos archivos fueron **cargados y explorados** para identificar su **estructura, variables** y posibles **problemas de calidad**, como **valores faltantes o duplicados**.
 
-Luego, en la segunda fase, se realizó la integración de las bases. Esto implicó conectar las distintas fuentes —por ejemplo, uniendo los identificadores de libros con sus etiquetas o consolidando las valoraciones— para construir una base maestra lista para el análisis. Durante este paso también se seleccionaron las variables más relevantes para responder las preguntas de investigación planteadas, como el promedio de calificaciones, el número de reseñas, el año de publicación y el género principal de cada obra.
+Luego, en la segunda fase, se realizó la **integración de las bases**. Esto implicó **conectar las distintas fuentes** —por ejemplo, **uniendo los identificadores de libros con sus etiquetas** o **consolidando las valoraciones**— para construir una **base maestra lista para el análisis**. Durante este paso también se seleccionaron las **variables más relevantes** para responder las **preguntas de investigación** planteadas, como el **promedio de calificaciones, el número de reseñas, el año de publicación** y el **género principal de cada obra**.
 
-Finalmente, el proyecto avanza hacia la fase de análisis y visualización, donde se aplican herramientas de manipulación y graficación (principalmente del paquete tidyverse) para descubrir patrones y tendencias en los datos. Esta parte incluye comparaciones entre géneros literarios, evolución temporal de las publicaciones y exploración de los libros más populares según distintos criterios.
+Finalmente, el proyecto avanza hacia la fase de **análisis y visualización**, donde se aplican **herramientas de manipulación y graficación** (principalmente del paquete **tidyverse**) para **descubrir patrones y tendencias** en los datos. Esta parte incluye **comparaciones entre géneros literarios, evolución temporal de las publicaciones** y **exploración de los libros más populares** según distintos criterios.
 
-En cada etapa, el código está acompañado de comentarios explicativos y observaciones sobre los resultados intermedios, con el fin de que el lector no solo vea qué se hace, sino también por qué se hace. De este modo, el proyecto funciona tanto como un ejercicio práctico de análisis de datos en R como una guía para quienes quieran iniciarse en la exploración de datasets reales.
+En cada etapa, el código está acompañado de **comentarios explicativos y observaciones sobre los resultados intermedios**, con el fin de que el lector no solo vea qué se hace, sino también **por qué se hace**. De este modo, el proyecto funciona tanto como un **ejercicio práctico de análisis de datos en R** como una **guía para quienes quieran iniciarse** en la **exploración de datasets reales**.
 
 El repositorio está estructurado de la siguiente manera:
 - **Data**: Carpeta que contiene los archivos originales del dataset Goodbooks-10k en formato CSV.
@@ -49,11 +49,11 @@ El repositorio está estructurado de la siguiente manera:
 
 El dataset incluye los siguientes archivos principales:
 
-- **books.csv**: Este archivo contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
-- **books.tags.csv**: Este archivo contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
-- **ratings.csv**: Este archivo contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
-- **tags.csv**: Este archivo contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
-- **to_read.csv**: Este archivo contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
+- **books.csv**: contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
+- **books.tags.csv**: contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
+- **ratings.csv**: contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
+- **tags.csv**: contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
+- **to_read.csv**: contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
 
 Puedes descargar el dataset completo desde Kaggle en el siguiente enlace: https://www.kaggle.com/datasets/zygmunt/goodbooks-10k. Asegúrate de guardar los archivos CSV en la carpeta "Data" del repositorio para que los scripts puedan acceder a ellos correctamente.
 
@@ -365,7 +365,17 @@ El análisis revela que la relación entre la valoración promedio de un libro y
 
 Esto sugiere que la popularidad de un libro depende de múltiples factores más allá de su calidad percibida, como la visibilidad del autor, la estrategia editorial, la adaptación audiovisual o la presencia en comunidades de lectura. En resumen, una buena calificación puede ayudar, pero no garantiza el éxito masivo; el interés de los usuarios parece responder tanto a tendencias culturales como a recomendaciones externas, más que únicamente al promedio de estrellas.
 
+## 6. Próximos pasos y cierre del proyecto
 
+Este proyecto ha avanzado mucho en la exploración del dataset **Goodbooks-10k**, pero todavía queda un mundo por descubrir. En las próximas entregas, nos enfocaremos en responder **preguntas que aún nos intrigan y que prometen revelar patrones interesantes del mundo lector**:
 
+- **¿Cuáles son los géneros o etiquetas más comunes entre los libros mejor valorados por los usuarios?**  
+- **¿Qué características comparten los títulos que más usuarios marcan como “por leer”?**  
+- **¿Cómo varían las calificaciones y reseñas según el género, autor y año de publicación?**  
 
+Estas preguntas nos permitirán adentrarnos en la forma en que los lectores interactúan con los libros, cuáles son sus preferencias y cómo la popularidad y la valoración se combinan en distintos contextos literarios.
+
+Además, en las etapas siguientes compartiremos **las conclusiones finales del proyecto**, donde recopilaremos los hallazgos más relevantes y presentaremos **recomendaciones basadas en los datos**. Esto incluirá **sugerencias de lectura**, insights sobre **géneros y autores destacados**, y reflexiones sobre **tendencias culturales en la lectura**, que podrían ser de interés tanto para lectores curiosos como para investigadores y profesionales del mundo editorial.
+
+En pocas palabras, este proyecto es una **aventura dentro del universo de los datos literarios**. Aunque ya hemos avanzado bastante, lo más interesante está por venir. **Sigue con nosotros para descubrir qué nos cuentan los libros y quienes los leen**.
 
