@@ -49,13 +49,44 @@ El repositorio está estructurado de la siguiente manera:
 
 El dataset incluye los siguientes archivos principales:
 
-- books.csv: Este archivo contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
-- books.tags.csv: Este archivo contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
-- ratings.csv: Este archivo contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
-- tags.csv: Este archivo contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
-- to_read.csv: Este archivo contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
+- **books.csv**: Este archivo contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
+- **books.tags.csv**: Este archivo contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
+- **ratings.csv**: Este archivo contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
+- **tags.csv**: Este archivo contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
+- **to_read.csv**: Este archivo contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
 
 Puedes descargar el dataset completo desde Kaggle en el siguiente enlace: https://www.kaggle.com/datasets/zygmunt/goodbooks-10k. Asegúrate de guardar los archivos CSV en la carpeta "Data" del repositorio para que los scripts puedan acceder a ellos correctamente.
+
+### 3.1 Limpieza e integración de las bases de Goodreads
+
+Antes de explorar los datos y crear visualizaciones, se realizó un **proceso de limpieza y preparación** de las cinco bases principales del dataset Goodbooks-10k. Este paso es crucial para asegurar que los análisis sean consistentes y representativos, aunque los detalles del código estén disponibles en los scripts de la carpeta `Scripts`.  
+
+#### 3.1.1 Limpieza de cada base
+
+Durante la limpieza se realizaron las siguientes acciones principales:
+
+- **Filtrado de años válidos:** Se conservaron solo libros publicados entre **1800 y 2017**, eliminando registros fuera de rango o sin año de publicación. Esto garantiza un rango temporal realista según los datos de Goodreads.  
+- **Eliminación de duplicados exactos:** Se eliminaron registros duplicados en todas las bases por seguridad, aunque la mayoría de los duplicados se encontraba en la tabla `book_tags`.  
+- **Valores críticos faltantes (NA):** Se conservaron únicamente libros con **título y año**, esenciales para cualquier análisis. Otros campos, como ISBN o idioma, se mantienen aunque falten, ya que no afectan el análisis descriptivo principal.  
+- **Revisión de idiomas:** Se identificaron los idiomas más frecuentes y se filtraron los libros en **inglés**, que representa la mayoría de los registros. Además, se homogeneizó la etiqueta de idioma para facilitar el análisis.  
+- **Selección de variables relevantes:** Se redujo cada base a las columnas esenciales para el análisis, por ejemplo, título, autor, año, calificaciones y etiquetas de libros.  
+
+Como resultado de este proceso, se generaron las bases limpias: `books_clean.csv`, `book_tags_clean.csv`, `tags_clean.csv`, `ratings_clean.csv` y `to_read_clean.csv`, listas para la integración y análisis posterior.
+
+#### 3.1.2 Integración de las bases limpias
+
+Una vez limpias, las cinco bases se **unieron para crear la base final** que contiene toda la información necesaria para análisis exploratorios y visualizaciones. Esta base final se llama `books_final_integrated.csv`, pero en los scripts de visualización se utiliza el nombre **`books_full`**.  
+
+Los pasos clave de la integración fueron:
+
+- **Unión con tags:** Cada libro recibió su **tag principal**, es decir, el género o tema más frecuente según la base `book_tags_clean`.  
+- **Agregación de ratings:** Se calculó para cada libro la **valoración promedio** y el **número total de valoraciones**.  
+- **Incorporación de “por leer”:** Se sumó la cantidad de usuarios que marcaron cada libro como “por leer”, como indicador de interés potencial.  
+- **Verificación final:** La base final contiene **8.130 libros y 15 variables**, con información completa de título, autor, año, idioma, género, calificaciones y métricas de interés de los usuarios. Los valores faltantes se concentran principalmente en libros sin calificaciones o sin registros en “por leer”.  
+
+La base final está disponible en `Data Limpia/books_final_integrated.csv`. Todos los pasos de limpieza e integración están documentados en los scripts de la carpeta `Scripts`, para quienes quieran replicar o profundizar en el proceso.
+
+Esta fase asegura que el análisis posterior y las visualizaciones se realicen sobre un dataset **consistente, integrado y representativo**, facilitando la exploración de patrones de popularidad, valoración y preferencias lectoras en Goodreads.
 
 ## 4. Pasos a seguir
 
@@ -87,7 +118,7 @@ Siguiendo estos pasos, podrás reproducir el análisis y explorar los datos por 
 
 ¡Feliz análisis de datos! 📊📚
 
-## 6.Explorando la relación entre valoración y popularidad en Goodreads 📖
+## 5.Explorando la relación entre valoración y popularidad en Goodreads 📖
 
 Una de las preguntas más interesantes que surgen al analizar el dataset *Goodbooks-10k* es: **¿Qué relación existe entre la valoración promedio de un libro y su nivel de popularidad entre los usuarios?**
 
