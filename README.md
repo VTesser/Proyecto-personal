@@ -190,7 +190,7 @@ saveWidget(ggplotly_p, "../Outputs/grafico_libros_interactivo.html", selfcontain
 
 ```
 
-![Popularidad vs Valoración Promedio de Libros en Goodreads](Outputs/grafico_libros_interactivo.html)
+[Ver gráfico interactivo](https://vtesser.github.io/Proyecto-personal/Outputs/grafico_libros_interactivo.html)
 
 Donde observamos la misma tendencia que en el gráfico anterior, pero con la ventaja de poder explorar cada punto individualmente al pasar el cursor sobre ellos. Esto permite identificar títulos específicos, sus autores y detalles de valoración y popularidad.
 
