@@ -76,18 +76,26 @@ library(dplyr)
 books_clean <- books_full %>%
   filter(!is.na(avg_rating), !is.na(n_ratings))
 
-ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
+grafico_pop <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   geom_point(alpha = 0.4, color = "#0072B2") +
   scale_x_log10() +
   labs(
     title = "Relación entre popularidad y valoración promedio en Goodreads",
     x = "Número de valoraciones (escala logarítmica)",
     y = "Valoración promedio",
-    caption = "Fuente: Dataset Goodbooks-10k (Kaggle)"
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) Visualización: Valentina Tesser"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16)  # negrita y tamaño opcional
+  )
+
+# Guardar el gráfico 
+
+ggsave("../Outputs/grafico_populares.png", grafico_pop, width = 12, height = 8, dpi = 300)
 
 ```
+
 
 En el gráfico de dispersión, donde cada punto representa un libro, se observa una alta concentración entre las 100 y 1.000 valoraciones (recordando que el eje X está en escala logarítmica). Esto significa que la mayoría de los títulos del dataset son moderadamente populares, sin llegar a los niveles masivos de lecturas que tienen algunos best-sellers.
 
@@ -97,64 +105,7 @@ También se pueden notar algunos valores atípicos —libros con muchas valoraci
 
 En síntesis, la concentración de puntos muestra que la mayoría de los libros tiene una recepción positiva pero una visibilidad limitada, y que la popularidad extrema es la excepción.
 
-
-## Otras opciones de grafico 
-
-```{r}
-library(ggplot2)
-library(dplyr)
-library(scales)
-
-books_clean <- books_full %>%
-  filter(!is.na(avg_rating), !is.na(n_ratings))
-
-ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
-  geom_point(aes(color = avg_rating), alpha = 0.6, size = 2) +
-  scale_color_gradient(low = "#FF7F0E", high = "#1F77B4") +
-  scale_x_log10(labels = comma) +
-  labs(
-    title = "Popularidad vs Valoración Promedio de Libros en Goodreads",
-    subtitle = "Cada punto representa un libro",
-    x = "Número de valoraciones (escala logarítmica)",
-    y = "Valoración promedio",
-    color = "Valoración promedio",
-    caption = "Fuente: Goodbooks-10k (Kaggle)"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    plot.title = element_text(face = "bold", size = 16),
-    plot.subtitle = element_text(size = 12),
-    legend.position = "right"
-  )
-
-```
-
-
-
-```{r}
-library(plotly)
-
-p <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating,
-                             text = paste("Título:", title,
-                                          "<br>Autor:", authors,
-                                          "<br>Valoración promedio:", avg_rating,
-                                          "<br>Número de valoraciones:", n_ratings))) +
-  geom_point(aes(color = avg_rating), alpha = 0.6, size = 2) +
-  scale_color_gradient(low = "#FF7F0E", high = "#1F77B4") +
-  scale_x_log10(labels = comma) +
-  labs(
-    title = "Popularidad vs Valoración Promedio de Libros en Goodreads",
-    x = "Número de valoraciones (escala logarítmica)",
-    y = "Valoración promedio",
-    color = "Valoración promedio"
-  ) +
-  theme_minimal(base_size = 14)
-
-ggplotly(p, tooltip = "text")
-
-
-
-```
+Igualmente, podemos ver mejor los datos en el siguiente gráfico: 
 
 
 ```{r}
@@ -192,10 +143,9 @@ ggplotly_p <- ggplotly(p, tooltip = "text")
 # Guardar como archivo HTML
 saveWidget(ggplotly_p, "../Outputs/grafico_libros_interactivo.html", selfcontained = TRUE)
 
-
-
 ```
 
+Donde observamos la misma tendencia que en el gráfico anterior, pero con la ventaja de poder explorar cada punto individualmente al pasar el cursor sobre ellos. Esto permite identificar títulos específicos, sus autores y detalles de valoración y popularidad.
 
 
 # 2. Densidad bivariada: concentración de libros
