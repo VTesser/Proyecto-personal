@@ -13,9 +13,10 @@ Mi idea fue transformar este conjunto de datos en una **historia contada con R**
 
 A lo largo del análisis, busco responder algunas preguntas que van más allá de la simple curiosidad estadística. Por ejemplo:
 
-- ¿Qué relación existe entre la valoración promedio de un libro y su popularidad entre los usuarios?
-- ¿Cuáles son los géneros o etiquetas más comunes entre los libros mejor calificados?
-- ¿Qué características tienen los títulos que más personas marcan como por leer?
+- **¿Qué relación existe entre la valoración promedio de un libro y su nivel de popularidad en Goodreads?** (Busca conectar el aprecio subjetivo con el número de lectores o reseñas, midiendo si los libros más calificados son también los más leídos o comentados)
+- **¿Cuáles son los géneros o etiquetas más comunes entre los libros mejor valorados por los usuarios?** (Permite explorar preferencias colectivas y patrones culturales en los gustos de lectura).
+- **¿Qué características comparten los títulos que más usuarios marcan como “por leer”?** (Integra la variable del archivo “to_read” para entender la anticipación lectora o el interés potencial hacia ciertos libros).
+- **¿Cómo varían las calificaciones y reseñas según el género, autor y año de publicación?** (Explora diferencias sistemáticas entre tipos de libros y tendencias temporales).
 
 Estas interrogantes combinan el interés cultural por las preferencias lectoras con un enfoque técnico en análisis de datos.
 
@@ -42,18 +43,7 @@ El repositorio está estructurado de la siguiente manera:
 - **Outputs**: Carpeta donde se guardan las visualizaciones y resultados generados durante el análisis.
 - **README.md**: Este archivo, que proporciona una visión general del proyecto y su estructura
 
-## 3. Requisitos para reproducir el análisis
-
-Para reproducir el análisis presentado en este proyecto, necesitarás tener instalado R y RStudio en tu computadora. Además, es importante contar con las siguientes librerías del ecosistema tidyverse, que facilitan la manipulación y visualización de datos:
-- tidyverse
-- dplyr
-- ggplot2
-- readr
-- tidyr
-- summarytools
-
-
-## 4. Base de datos
+## 3. Base de datos
 
 **Goodbooks-10k dataset**: El dataset Goodbooks-10k es una colección de datos que contiene información sobre más de 10,000 libros, sus autores, calificaciones y etiquetas (tags) asociadas. Este conjunto de datos es ideal para realizar análisis exploratorios y visualizaciones relacionadas con la popularidad y características de los libros.
 
@@ -67,14 +57,26 @@ El dataset incluye los siguientes archivos principales:
 
 Puedes descargar el dataset completo desde Kaggle en el siguiente enlace: https://www.kaggle.com/datasets/zygmunt/goodbooks-10k. Asegúrate de guardar los archivos CSV en la carpeta "Data" del repositorio para que los scripts puedan acceder a ellos correctamente.
 
-## 5. Pasos a seguir
+## 4. Pasos a seguir
 
 Para reproducir el análisis presentado en este proyecto, sigue estos pasos:
 1. Clona o descarga este repositorio en tu computadora.
 2. Asegúrate de tener R y RStudio instalados.
 3. Instala las librerías necesarias si aún no las tienes:
-```R
-install.packages(c("tidyverse", "dplyr", "ggplot2", "readr", "tidyr", "summarytools"))
+```{r}
+install.packages(c(
+  "tidyverse",
+  "dplyr",
+  "ggplot2",
+  "readr",
+  "tidyr",
+  "summarytools",
+  "plotly",
+  "scales",
+  "htmlwidgets",
+  "forcats",
+  "stringr"
+))
 ```
 4. Coloca los archivos CSV del dataset Goodbooks-10k en la carpeta "Data" del repositorio.
 5. Abre RStudio y carga los scripts de R desde la carpeta "Scripts" en el orden indicado (limpieza, integración, análisis).
@@ -211,6 +213,9 @@ Donde observamos la misma tendencia que en el gráfico anterior, pero con la ven
 El gráfico siguiente muestra la concentración de títulos en torno a ciertos rangos de popularidad y valoración promedio.
 
 ```{r}
+library(ggplot2)
+library(scales) 
+
 grafico_densidad <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   geom_bin2d(bins = 30) +
   scale_x_log10() +

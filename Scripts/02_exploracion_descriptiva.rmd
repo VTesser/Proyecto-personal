@@ -156,6 +156,27 @@ Donde observamos la misma tendencia que en el gráfico anterior, pero con la ven
 El gráfico siguiente muestra la concentración de títulos en torno a ciertos rangos de popularidad y valoración promedio.
 
 ```{r}
+install.packages(c(
+  "tidyverse",
+  "dplyr",
+  "ggplot2",
+  "readr",
+  "tidyr",
+  "summarytools",
+  "plotly",
+  "scales",
+  "htmlwidgets",
+  "forcats",
+  "stringr"
+))
+```
+
+
+
+```{r}
+library(ggplot2)
+library(scales) 
+
 grafico_densidad <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   geom_bin2d(bins = 30) +
   scale_x_log10() +
