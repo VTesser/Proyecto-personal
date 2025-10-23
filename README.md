@@ -214,26 +214,34 @@ ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   ) +
   theme_minimal()
 ```
+
+![Vista previa del gráfico](Outputs/grafico_densidad_bivariada.png)
+
+
 El gráfico de densidad bivariada muestra prácticamente la misma tendencia que el anterior, pero con una forma diferente de representación. En lugar de mostrar puntos individuales, utiliza cuadrantes de color que representan la concentración de observaciones. Las zonas más oscuras indican donde hay más libros. En este caso, la concentración principal también está entre 100 y 1.000 valoraciones y calificaciones promedio entre 3,5 y 4,3 estrellas, exactamente como en el gráfico anterior. 
 
 Por lo tanto, ambos gráficos entregan la misma información general, pero con distintos propósitos visuales: el diagrama de dispersión es útil para mostrar casos individuales y detectar valores atípicos. Por otro lado, el gráfico de densidad es mejor para mostrar patrones generales de concentración cuando hay muchos datos y los puntos se sobreponen.
 
-#### 3. Correlación entre valoración y popularidad
-
-Para cuantificar la relación, calculamos la correlación de Pearson entre ambas variables:
+#### 3. Correlación entre valoración promedio y número de valoraciones
 
 ```{r}
 cor_test <- cor.test(books_clean$avg_rating, books_clean$n_ratings, use = "complete.obs")
 cor_test
 ```
 
-Esto significa que la correlación entre la valoración promedio (avg_rating) y la popularidad (n_ratings) es positiva pero muy débil (r = 0.086).
+Se evaluó la relación entre la valoración promedio de los libros y su número de valoraciones en Goodreads utilizando el coeficiente de correlación de Pearson.
 
-Aunque el p-value (< 0.05) indica que la relación es estadísticamente significativa, su magnitud es tan baja que no tiene relevancia práctica fuerte.
+| Estadístico                    | Valor            |
+| ------------------------------ | ---------------- |
+| Coeficiente de correlación (r) | **0.086**        |
+| Grados de libertad (df)        | 654              |
+| Estadístico t                  | 2.22             |
+| p-valor                        | 0.027            |
+| Intervalo de confianza (95%)   | [0.0099, 0.1619] |
 
-En otras palabras, los libros más populares tienden a tener ligeramente mejores calificaciones, pero esta relación es mínima. 
 
-Esto sugiere que la popularidad no necesariamente se explica por la calidad percibida, sino también por otros factores —como la promoción editorial, la fama del autor o la pertenencia a géneros con grandes comunidades lectoras.
+Existe una correlación positiva muy débil, aunque estadísticamente significativa (p < 0.05), entre el número de valoraciones y la valoración promedio.
+Esto sugiere que los libros con más valoraciones tienden a tener ligeramente mayores puntuaciones promedio, pero la relación es muy baja, lo que indica que la popularidad no determina necesariamente una mejor percepción por parte de los lectores.
 
 #### 4. Los libros más populares vs. los mejor calificados
 

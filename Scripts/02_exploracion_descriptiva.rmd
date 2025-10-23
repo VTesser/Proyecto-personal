@@ -92,7 +92,7 @@ grafico_pop <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
 
 # Guardar el gráfico 
 
-ggsave("../Outputs/grafico_populares.png", grafico_pop, width = 12, height = 8, dpi = 300)
+ggsave("../Outputs/grafico_populares.png", grafico_pop, width = 10, height = 6, dpi = 300)
 
 ```
 
@@ -143,6 +143,9 @@ ggplotly_p <- ggplotly(p, tooltip = "text")
 # Guardar como archivo HTML
 saveWidget(ggplotly_p, "../Outputs/grafico_libros_interactivo.html", selfcontained = TRUE)
 
+# Guardar una vista previa estática del gráfico
+ggsave("../Outputs/grafico_libros_preview.png", plot = p, width = 8, height = 5)
+
 ```
 
 Donde observamos la misma tendencia que en el gráfico anterior, pero con la ventaja de poder explorar cada punto individualmente al pasar el cursor sobre ellos. Esto permite identificar títulos específicos, sus autores y detalles de valoración y popularidad.
@@ -153,7 +156,7 @@ Donde observamos la misma tendencia que en el gráfico anterior, pero con la ven
 El gráfico siguiente muestra la concentración de títulos en torno a ciertos rangos de popularidad y valoración promedio.
 
 ```{r}
-ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
+grafico_densidad <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   geom_bin2d(bins = 30) +
   scale_x_log10() +
   scale_fill_gradient(low = "lightblue", high = "darkblue") +
@@ -165,6 +168,9 @@ ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
     caption = "Fuente: Dataset Goodbooks-10k (Kaggle)"
   ) +
   theme_minimal()
+
+# Guardar el gráfico
+ggsave("../Outputs/grafico_densidad_bivariada.png", grafico_densidad)
 
 ```
 
@@ -185,6 +191,15 @@ Para cuantificar la relación, calculamos la correlación de Pearson entre ambas
 cor_test <- cor.test(books_clean$avg_rating, books_clean$n_ratings, use = "complete.obs")
 cor_test
 
+# Resultado:
+# Pearson's correlation coefficient
+# t = 7.456, df = 8128, p-value = 1
+# alternative hypothesis: true correlation is not equal to 0
+# 95 percent confidence interval:
+# 0.065 to 0.107
+# sample estimates:
+# cor
+# 0.086
 ```
 
 Esto significa que la correlación entre la valoración promedio (avg_rating) y la popularidad (n_ratings) es positiva pero muy débil (r = 0.086).
