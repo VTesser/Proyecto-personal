@@ -13,10 +13,10 @@ Mi idea fue transformar este conjunto de datos en una **historia contada con R**
 
 A lo largo del análisis, busco responder algunas preguntas que van más allá de la simple curiosidad estadística. Por ejemplo:
 
-- **¿Qué relación existe entre la valoración promedio de un libro y su nivel de popularidad en Goodreads?** (Busca conectar el aprecio subjetivo con el número de lectores o reseñas, midiendo si los libros más calificados son también los más leídos o comentados)
-- **¿Cuáles son los géneros o etiquetas más comunes entre los libros mejor valorados por los usuarios?** (Permite explorar preferencias colectivas y patrones culturales en los gustos de lectura).
-- **¿Qué características comparten los títulos que más usuarios marcan como “por leer”?** (Integra la variable del archivo “to_read” para entender la anticipación lectora o el interés potencial hacia ciertos libros).
-- **¿Cómo varían las calificaciones y reseñas según el género, autor y año de publicación?** (Explora diferencias sistemáticas entre tipos de libros y tendencias temporales).
+- **¿Qué relación existe entre la valoración promedio de un libro y su nivel de popularidad en Goodreads?** 
+- **¿Cuáles son los géneros o etiquetas más comunes entre los libros mejor valorados por los usuarios?** 
+- **¿Qué características comparten los títulos que más usuarios marcan como “por leer”?** 
+- **¿Cómo varían las calificaciones y reseñas según el género, autor y año de publicación?** 
 
 Estas interrogantes combinan el interés cultural por las preferencias lectoras con un enfoque técnico en análisis de datos.
 
