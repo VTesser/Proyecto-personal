@@ -129,16 +129,23 @@ library(dplyr)
 books_clean <- books_full %>%
   filter(!is.na(avg_rating), !is.na(n_ratings))
 
-ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
+grafico_pop <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   geom_point(alpha = 0.4, color = "#0072B2") +
   scale_x_log10() +
   labs(
     title = "Relación entre popularidad y valoración promedio en Goodreads",
     x = "Número de valoraciones (escala logarítmica)",
     y = "Valoración promedio",
-    caption = "Fuente: Dataset Goodbooks-10k (Kaggle)"
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) Visualización: Valentina Tesser"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16)  # negrita y tamaño opcional
+  )
+
+# Guardar el gráfico 
+
+ggsave("../Outputs/grafico_populares.png", grafico_pop, width = 10, height = 6, dpi = 300)
 ```
 
 ![Popularidad y valoración promedio](Outputs/grafico_populares.png)
@@ -188,6 +195,9 @@ ggplotly_p <- ggplotly(p, tooltip = "text")
 # Guardar como archivo HTML
 saveWidget(ggplotly_p, "../Outputs/grafico_libros_interactivo.html", selfcontained = TRUE)
 
+# Guardar una vista previa estática del gráfico
+ggsave("../Outputs/grafico_libros_preview.png", plot = p, width = 8, height = 5)
+
 ```
 ![Vista previa del gráfico](Outputs/grafico_libros_preview.png)
 
@@ -201,7 +211,7 @@ Donde observamos la misma tendencia que en el gráfico anterior, pero con la ven
 El gráfico siguiente muestra la concentración de títulos en torno a ciertos rangos de popularidad y valoración promedio.
 
 ```{r}
-ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
+grafico_densidad <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   geom_bin2d(bins = 30) +
   scale_x_log10() +
   scale_fill_gradient(low = "lightblue", high = "darkblue") +
@@ -213,6 +223,9 @@ ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
     caption = "Fuente: Dataset Goodbooks-10k (Kaggle)"
   ) +
   theme_minimal()
+
+# Guardar el gráfico
+ggsave("../Outputs/grafico_densidad_bivariada.png", grafico_densidad, width = 10, height = 6, dpi = 300)
 ```
 
 ![Vista previa del gráfico](Outputs/grafico_densidad_bivariada.png)
@@ -240,8 +253,10 @@ Se evaluó la relación entre la valoración promedio de los libros y su número
 | Intervalo de confianza (95%)   | [0.0099, 0.1619] |
 
 
-Existe una correlación positiva muy débil, aunque estadísticamente significativa (p < 0.05), entre el número de valoraciones y la valoración promedio.
-Esto sugiere que los libros con más valoraciones tienden a tener ligeramente mayores puntuaciones promedio, pero la relación es muy baja, lo que indica que la popularidad no determina necesariamente una mejor percepción por parte de los lectores.
+La correlación entre la valoración promedio (avg_rating) y la popularidad (n_ratings) es positiva pero muy débil (r = 0.086).
+Aunque el p-value (< 0.05) indica que la relación es estadísticamente significativa, su magnitud es tan baja que no tiene una relevancia práctica fuerte.
+
+En otras palabras, los libros más populares tienden a tener ligeramente mejores calificaciones, pero esta relación es mínima. Esto sugiere que la popularidad no necesariamente se explica por la calidad percibida, sino también por otros factores —como la promoción editorial, la fama del autor o la pertenencia a géneros con grandes comunidades lectoras—.
 
 #### 4. Los libros más populares vs. los mejor calificados
 
@@ -291,12 +306,8 @@ grafico_top15 <- ggplot(top_books, aes(y = title_wrapped, x = n_ratings_plot, co
   ) +
   coord_cartesian(clip = "off")
 
-# Guardar el gráfico en tu carpeta del proyecto
-ggsave("~/Desktop/Universidad 2025/Datos magister/Proyecto personal/Outputs/grafico_top15_populares.png", grafico_top15, width = 12, height = 8, dpi = 300)
-
-png("Outputs/grafico_top15_populares.png", width = 800, height = 600)
-plot(mtcars$mpg, mtcars$hp)  # Aquí tu código de gráfico
-dev.off()
+# Guardar el gráfico en la carpeta del proyecto
+ggsave("../Outputs/grafico_top15_populares.png", grafico_top15, width = 12, height = 8, dpi = 300)
 
 ```
 

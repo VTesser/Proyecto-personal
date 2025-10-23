@@ -170,7 +170,7 @@ grafico_densidad <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   theme_minimal()
 
 # Guardar el gráfico
-ggsave("../Outputs/grafico_densidad_bivariada.png", grafico_densidad)
+ggsave("../Outputs/grafico_densidad_bivariada.png", grafico_densidad, width = 10, height = 6, dpi = 300)
 
 ```
 
@@ -202,13 +202,10 @@ cor_test
 # 0.086
 ```
 
-Esto significa que la correlación entre la valoración promedio (avg_rating) y la popularidad (n_ratings) es positiva pero muy débil (r = 0.086).
+La correlación entre la valoración promedio (avg_rating) y la popularidad (n_ratings) es positiva pero muy débil (r = 0.086).
+Aunque el p-value (< 0.05) indica que la relación es estadísticamente significativa, su magnitud es tan baja que no tiene una relevancia práctica fuerte.
 
-Aunque el p-value (< 0.05) indica que la relación es estadísticamente significativa, su magnitud es tan baja que no tiene relevancia práctica fuerte.
-
-En otras palabras, los libros más populares tienden a tener ligeramente mejores calificaciones, pero esta relación es mínima. 
-
-Esto sugiere que la popularidad no necesariamente se explica por la calidad percibida, sino también por otros factores —como la promoción editorial, la fama del autor o la pertenencia a géneros con grandes comunidades lectoras
+En otras palabras, los libros más populares tienden a tener ligeramente mejores calificaciones, pero esta relación es mínima. Esto sugiere que la popularidad no necesariamente se explica por la calidad percibida, sino también por otros factores —como la promoción editorial, la fama del autor o la pertenencia a géneros con grandes comunidades lectoras—.
 
 # 4. Los libros más populares vs. los mejor calificados
 
