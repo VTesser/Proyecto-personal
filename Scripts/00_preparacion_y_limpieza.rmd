@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Fase 0 - Preparación y limpieza de bases
 
 Exploración de base de datos para proyecto personal de Datos Magister. La idea de la investigación es sacar datos de GOODREADS y analizar los libros mas populares por genero, autor, año, etc. 
 
@@ -20,7 +21,7 @@ Tercera pregunta de investigación: ¿Existe alguna correlacion entre el año de
 
 Cuarta pregunta de investigacion: ¿Cuales son los autores mas populares en GOODREADS y que caracteristicas comparten sus obras?
 
-#Librerias 
+# 1.Librerias 
 
 ```{r}
 library(tidyverse)
@@ -32,7 +33,7 @@ library(summarytools)
 
 
 
-#Base de datos
+# 2. Base de datos
 
 Goodbooks-10k dataset
 
@@ -67,7 +68,7 @@ View(to_read)
 ```
 
 
-#Exploración de base de datos
+# 3. Exploración de base de datos
 
 ```{r}
 # ---- books.csv ----
@@ -98,12 +99,12 @@ dim(to_read)
 ```
 
 
-#Explorar rango temporal de los libros
+# 4. Explorar rango temporal de los libros
 
 Apuntes: 
 
 - Base va del año -1750 hasta 2017
-- Hay 21 NA (cuando se hace el cruce respecto a la distribucion de libros por año)
+- Hay 21 NA (cuando se hace el cruce respecto a la distribución de libros por año)
 
 ```{r}
 # Año de publicación mínimo y máximo
@@ -117,7 +118,7 @@ books %>%
   print(n=30)   # Muestra hasta 30 años consecutivos
 ```
 
-# Revisar valores nulos y duplicados
+# 5. Revisar valores nulos y duplicados
 
 Apuntes
 
@@ -143,7 +144,7 @@ sum(duplicated(to_read))
 
 ```
 
-#Revisar valores únicos importantes
+# 6. Revisar valores únicos importantes
 
 ```{r}
 # Número de autores únicos = 4664
@@ -159,7 +160,7 @@ length(unique(tags$tag_name))
 length(unique(book_tags$tag_id))
 ```
 
-# Exploración inicial de popularidad
+# 7. Exploración inicial de popularidad
 
 ```{r}
 # Libros con más ratings
@@ -176,7 +177,7 @@ books %>%
   head(10)
 ```
 
-# Exploración de géneros
+# 8. Exploración de géneros
 
 ```{r}
 # Combinar book_tags y tags para ver los géneros más frecuentes
@@ -190,7 +191,7 @@ book_genres %>%
 
 ```
 
-#Exploración de “to_read” (libros por leer)
+# 9. Exploración de “to_read” (libros por leer)
 
 ```{r}
 # Número de libros marcados "por leer" por usuario
@@ -247,7 +248,7 @@ book_tags <- book_tags %>% distinct()
 to_read <- to_read %>% distinct()
 ```
 
-#3. Eliminar valores faltantes críticos
+# 3. Eliminar valores faltantes críticos
 
 Apuntes:
 
@@ -260,7 +261,7 @@ books <- books %>%
   filter(!is.na(original_title), !is.na(original_publication_year))
 ```
 
-#4. Revisar idiomas más frecuentes
+# 4. Revisar idiomas más frecuentes
 
 Apuntes:
 
@@ -284,7 +285,7 @@ table(books$language_code)
 ```
 
 
-# Selección de variables por base
+# 5. Selección de variables por base
 
 ```{r}
 
@@ -332,7 +333,7 @@ to_read_clean <- to_read %>%
 ```
 
 
-# Guardar bases limpias
+# 6. Guardar bases limpias
 
 ```{r}
 write.csv(books_clean, "books_clean.csv", row.names = FALSE)
