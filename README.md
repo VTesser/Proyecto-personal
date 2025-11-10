@@ -146,17 +146,10 @@ El objetivo de esta sección es identificar si existe una relación (lineal o no
 
 ### Visualización y analisis:
 
-1. Diagrama de dispersión: popularidad vs. valoración promedio
-2. Densidad bivariada: concentración de libros
-3. Correlación entre valoración y popularidad
-4. Los libros más populares vs. los mejor calificados
-
 - [1. Diagrama de dispersión: popularidad vs. valoración promedio](#1-diagrama-de-dispersión-popularidad-vs-valoración-promedio)
 - [2. Densidad bivariada: concentración de libros](#2-densidad-bivariada-concentración-de-libros)
 - [3. Correlación entre valoración promedio y número de valoraciones](#3-correlación-entre-valoración-promedio-y-número-de-valoraciones)
 - [4. Los libros más populares vs. los mejor calificados](#4-los-libros-más-populares-vs-los-mejor-calificados)
-
-
 
 #### 1. Diagrama de dispersión: popularidad vs. valoración promedio
 
