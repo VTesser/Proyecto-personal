@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Fase 0 - Preparación y limpieza de bases
+# Fase 1 - Preparación y limpieza de bases
 
 Exploración de base de datos para proyecto personal de Datos Magister. La idea de la investigación es sacar datos de GOODREADS y analizar los libros mas populares por genero, autor, año, etc. 
 

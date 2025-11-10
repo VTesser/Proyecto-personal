@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_knit$set(root.dir = getwd())
 ```
 
-# Fase 2 - Exploración descriptiva de datos de Goodreads
+# Fase 3 - Exploración descriptiva de datos de Goodreads
 
 Preguntas de investigación: 
 
