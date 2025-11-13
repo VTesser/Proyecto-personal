@@ -14,8 +14,8 @@ Mi idea fue transformar este conjunto de datos en una **historia contada con R**
 A lo largo del análisis, busco responder algunas preguntas que van más allá de la simple curiosidad estadística. Por ejemplo:
 
 - **¿Qué relación existe entre la valoración promedio de un libro y su nivel de popularidad en Goodreads?** 
-- **¿Cuáles son los géneros o etiquetas más comunes entre los libros mejor valorados por los usuarios?** 
-- **¿Qué características comparten los títulos que más usuarios marcan como “por leer”?** 
+- **¿Qué géneros literarios concentran el mayor interés entre los lectores, y cómo se distribuyen dentro del catálogo** 
+- **¿Qué factores explican que ciertos títulos despierten una mayor expectativa lectora y sean añadidos con más frecuencia a las listas "to-read"??** 
 - **¿Cómo varían las calificaciones y reseñas según el género, autor y año de publicación?** 
 
 Estas interrogantes combinan el interés cultural por las preferencias lectoras con un enfoque técnico en análisis de datos.
@@ -461,7 +461,268 @@ En síntesis, los libros que concentran mayor interés potencial en Goodreads co
 
 Este conjunto de hallazgos sugiere que en Goodreads, como en otros ecosistemas digitales, la popularidad anticipada responde más a dinámicas de visibilidad, reputación y consumo cultural compartido que a juicios estrictamente literarios. En consecuencia, la plataforma refleja no solo preferencias de lectura, sino también procesos sociales de reconocimiento, legitimación y pertenencia simbólica dentro de una comunidad global de lectores.
 
-## 6. Entre el deseo y la visibilidad: el mapa del interés lector en Goodreads ✨📖
+## 6. Entre géneros y tendencias lectoras en Goodreads 🌍
+
+Una de las preguntas más sugerentes al explorar el dataset *Goodbooks-10k* es:  **¿Qué géneros literarios concentran el mayor interés entre los lectores, y cómo se distribuyen dentro del catálogo?**  
+
+### 6.2 Objetivo analítico  
+
+El objetivo es visualizar la **distribución de los principales géneros literarios** en Goodreads, observando qué temáticas acumulan más títulos y cómo se posicionan dentro del interés lector general.  
+
+A través de esta exploración, se pretende comprender las dinámicas de representación cultural que emergen en la plataforma, considerando tanto la diversidad de categorías disponibles como las tendencias de consumo que priorizan ciertos géneros sobre otros.
+
+**Índice de visualizaciones:**
+
+- [6.3 Gráfico de distribución original](#63-gráfico-de-distribución-original)  
+- [6.4 Gráfico de distribución con nuevo dataset (filtrado)](#64-gráfico-de-distribución-con-nuevo-dataset-filtrado)  
+
+### 6.3 Grafico de distribución original 
+
+Con este gráfico se busca observar la composición general del dataset original, es decir, cómo se distribuyen los libros según sus géneros sin aplicar ningún filtro sobre las valoraciones (`avg_rating`).
+
+Este primer paso resulta clave para obtener una visión panorámica del conjunto completo de obras, antes de introducir restricciones analíticas. De esta forma, se pueden identificar patrones de sobre-representación o ausencia de ciertos géneros que podrían deberse al sesgo propio de la plataforma o a la estructura del dataset.
+
+El análisis parte de la premisa de que Goodreads, como comunidad digital, refleja preferencias culturales colectivas, pero también las distorsiona según la popularidad, la traducción de obras o la disponibilidad de ciertos títulos en inglés. Por ello, mantener inicialmente todos los registros —incluso aquellos sin calificaciones— permite captar el “universo total” del catálogo.
+
+#### 6.3.1 Limpieza y depuración de datos  
+
+La limpieza de datos es una etapa fundamental para asegurar la validez del análisis. En el dataset Goodbooks-10k, los libros están asociados a múltiples etiquetas (tags) asignadas por los usuarios, lo que genera redundancia y ruido semántico. Por ejemplo, un mismo género puede aparecer bajo distintas variantes (“classic” y “classics”), mientras que otras etiquetas no representan categorías literarias, sino contextos de uso (“book-club”) o nombres de autores (“paulo-coelho”).
+
+El objetivo de esta depuración es estandarizar las etiquetas, agrupando aquellas que refieren al mismo tipo de obra mediante la función case_when().
+Asimismo, se eliminan etiquetas genéricas o no literarias para evitar sesgos en la interpretación.
+
+Este proceso mejora la consistencia categorial y permite que los resultados sean comparables y representativos de los géneros propiamente dichos.
+
+```{r}
+# Filtrar libros con datos válidos y limpiar etiquetas no literarias
+books_genres_original <- books_full %>%
+  filter(!tag_name %in% c("to-read", "favorites", "currently-reading"))
+
+# Verificamos las etiquetas 
+sort(unique(books_genres_original$tag_name))
+
+books_genres_original <- books_genres_original %>%
+  mutate(
+    genre_label = case_when(
+      # Ficción y subgéneros
+      tag_name %in% c("fiction", "classic", "classics", "contemporary", "drama") ~ "Ficción / Clásicos",
+      tag_name %in% c("historical-fiction", "historical-romance") ~ "Ficción histórica",
+      tag_name %in% c("fantasy", "urban-fantasy", "discworld", "magic-tree-house", "star-wars", "warriors") ~ "Fantasía",
+      tag_name %in% c("science-fiction", "sci-fi") ~ "Ciencia ficción",
+      tag_name %in% c("dystopia", "dystopian") ~ "Distopía",
+      tag_name %in% c("crime", "noir", "thriller", "mystery", "sherlock-holmes", "espionage") ~ "Novela negra / Misterio",
+      tag_name %in% c("romance", "paranormal-romance", "chick-lit", "new-adult") ~ "Romance",
+      tag_name %in% c("horror", "zombies", "vampires") ~ "Terror / Sobrenatural",
+
+      # Infantil y juvenil
+      tag_name %in% c("children", "children-s", "children-s-books", "childrens", "childrens-books", "picture-books") ~ "Infantil",
+      tag_name %in% c("ya", "young-adult", "dork-diaries", "39-clues") ~ "Juvenil",
+
+      # No ficción
+      tag_name %in% c("non-fiction", "nonfiction") ~ "No ficción",
+      tag_name %in% c("biography", "memoir") ~ "Biografía / Memorias",
+      tag_name %in% c("history", "india") ~ "Historia",
+      tag_name %in% c("philosophy", "psychology") ~ "Ciencias humanas",
+      tag_name %in% c("science") ~ "Ciencia",
+      tag_name %in% c("music") ~ "Música",
+      tag_name %in% c("travel") ~ "Viajes",
+
+      # Otras categorías literarias
+      tag_name %in% c("poetry") ~ "Poesía",
+      tag_name %in% c("plays") ~ "Teatro",
+      tag_name %in% c("humor") ~ "Humor",
+      tag_name %in% c("graphic-novel", "graphic-novels", "manga", "mangá", "comics") ~ "Novela gráfica / Cómic",
+
+      # Otros casos específicos
+      tag_name %in% c("christian-fiction") ~ "Ficción cristiana",
+      tag_name %in% c("christmas") ~ "Navidad",
+
+      # Etiquetas no literarias o nombres de autores
+      tag_name %in% c("book-club", "books-i-own", "library", "school",
+                      "lee-child", "nicholas-sparks", "nora-roberts", 
+                      "sidney-sheldon", "james-patterson", "crossfire", 
+                      "david-baldacci", "agatha-christie", "paulo-coelho") ~ NA_character_,
+      # Default
+      TRUE ~ "Otro"
+    )
+  )
+```
+
+#### 6.3.2 Visualización del gráfico
+
+Una vez limpiados los datos, se calcula la frecuencia de aparición de cada género y se seleccionan los 10 más frecuentes. El gráfico de barras resultante permite observar de forma clara qué tipos de literatura dominan el dataset original.
+
+Esta visualización tiene un doble propósito:
+
+- **Descriptivo**, al mostrar el peso relativo de cada categoría dentro del catálogo.
+
+- **Exploratorio**, al sugerir posibles relaciones entre los géneros más abundantes y los patrones de valoración o lectura que se analizarán más adelante.
+
+```{r}
+# Calcular frecuencia y seleccionar top 10 géneros
+top_genres_original <- books_genres_original %>%
+  count(genre_label, sort = TRUE) %>%
+  filter(!is.na(genre_label)) %>%
+  slice_max(n, n = 10)
+
+# Gráfico
+grafico_p2_1 <- ggplot(top_genres_original, aes(x = reorder(genre_label, n), y = n)) +
+  geom_col(fill = "#104911", color = "white", width = 0.7) +
+  geom_text(aes(label = n), hjust = -0.1, size = 4, color = "gray20") +
+  coord_flip() +
+  labs(
+    title = "Distribución general de géneros literarios",
+    subtitle = "Top 10 géneros más frecuentes en el dataset original",
+    x = NULL,
+    y = "Número de libros",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, color = "black"),
+    plot.subtitle = element_text(size = 12, color = "gray30"),
+    axis.text.y = element_text(face = "bold", color = "#3C3C3C"),
+    axis.text.x = element_text(color = "gray30"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(size = 10, color = "gray40", hjust = 0),
+    plot.background = element_rect(fill = "white", color = NA)
+  ) +
+  expand_limits(y = max(top_genres_original$n) * 1.1)
+
+# Mostrar gráfico
+grafico_p2_1
+
+# Guardar salida
+ggsave("../Outputs/grafico_p2_1.png", grafico_p2_1, width = 10, height = 6, dpi = 300)
+```
+![Top 15 libros más populares](Outputs/grafico_p2_1.png)
+
+### 6.4 Gráfico de distribucion con nuevo dataset 
+
+El segundo gráfico introduce una comparación respecto al anterior, aplicando un filtro analítico para conservar únicamente los libros con una valoración promedio (`avg_rating`) disponible.
+Esta decisión metodológica tiene un propósito específico: evaluar cómo la ausencia de calificaciones afecta la diversidad de géneros observada.
+
+La existencia de 7.474 valores faltantes en `avg_rating` implica que una proporción considerable del catálogo nunca ha sido evaluada por los usuarios. Por tanto, trabajar con el dataset filtrado permite centrarse en las obras que efectivamente participan de la dinámica social de Goodreads —aquellas que fueron leídas, comentadas o calificadas—, aunque a costa de reducir la variedad temática.
+
+En esta versión, se vuelve a realizar un proceso de limpieza y recodificación de etiquetas, similar al anterior, pero ajustado a las nuevas condiciones del conjunto de datos.
+
+#### 6.4.1 Filtrar libros con datos válidos de género y valoración
+
+Filtrar por registros con calificación promedio y etiquetas válidas garantiza que los géneros analizados representen libros efectivamente leídos o reseñados, en lugar de simples intenciones de lectura. Este criterio busca mejorar la robustez interpretativa del análisis, al centrarse en el comportamiento observable de la comunidad lectora.
+
+Sin embargo, esta depuración no está exenta de costos: al eliminar observaciones incompletas, se pierde parte del espectro literario —particularmente géneros minoritarios o menos populares—, lo que puede sesgar el análisis hacia obras con mayor visibilidad.
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+books_genres <- books_full %>%
+filter(!is.na(avg_rating), !is.na(tag_name))
+
+# Revisión básica
+summary(books_genres$avg_rating)
+n_distinct(books_genres$tag_name)
+head(unique(books_genres$tag_name), 20) 
+```
+Al revisar la distribución, se observa que el campo avg_rating contiene 7474 valores faltantes, lo que implica una pérdida considerable de observaciones.
+
+De los géneros disponibles, varios corresponden a etiquetas no literarias (“to-read”, “favorites”) o autores individuales (“paulo-coelho”), por lo que deben eliminarse para evitar ruido en el análisis.
+
+#### 6.4.2 Limpieza de etiquetas y visualización final
+
+Tras el filtrado, se vuelven a unificar etiquetas redundantes y se traducen las categorías más representativas al español. 
+
+Luego, se grafica la distribución de frecuencias para los géneros resultantes, destacando los once más comunes. El gráfico muestra una estructura concentrada en torno a ficción, clásicos y fantasía, evidenciando que los géneros narrativos siguen dominando incluso tras la depuración.
+
+```{r}
+# Filtrar libros con datos válidos y limpiar etiquetas no literarias
+books_genres <- books_full %>%
+  filter(!is.na(avg_rating), !is.na(tag_name)) %>%
+  filter(!tag_name %in% c("to-read", "favorites", "currently-reading", "paulo-coelho")) %>%
+  mutate(
+    # Unificar etiquetas equivalentes
+    tag_name = case_when(
+      tag_name == "sci-fi" ~ "science-fiction",
+      TRUE ~ tag_name
+    )
+  )
+
+# Revisión rápida
+summary(books_genres$avg_rating)
+n_distinct(books_genres$tag_name)
+sort(unique(books_genres$tag_name))
+
+# Crear etiquetas legibles en español
+books_genres <- books_genres %>%
+  mutate(
+    genre_label = recode(tag_name,
+      "classics" = "Clásicos",
+      "fantasy" = "Fantasía",
+      "fiction" = "Ficción",
+      "historical-fiction" = "Ficción histórica",
+      "history" = "Historia",
+      "humor" = "Humor",
+      "noir" = "Novela negra",
+      "non-fiction" = "No ficción",
+      "science-fiction" = "Ciencia ficción",
+      "science" = "Ciencia",
+      "travel" = "Viajes"
+    )
+  )
+
+library(dplyr)
+library(ggplot2)
+
+# Calcular frecuencia
+top_genres <- books_genres %>%
+  count(genre_label, sort = TRUE)
+
+# Gráfico 
+grafico_p2_2 <- ggplot(top_genres, aes(x = reorder(genre_label, n), y = n)) +
+  geom_col(fill = "#E75480", color = "white", width = 0.7) +
+  geom_text(aes(label = n), hjust = -0.1, size = 4, color = "gray20") +
+  coord_flip() +
+  labs(
+    title = "Distribución de géneros literarios en Goodreads",
+    subtitle = "Frecuencia de los 11 géneros principales del dataset Goodbooks-10k",
+    x = NULL,
+    y = "Número de libros",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) Visualización: Valentina Tesser"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, color = "#4A0033"),
+    plot.subtitle = element_text(size = 12, color = "gray30"),
+    axis.text.y = element_text(face = "bold", color = "#3C3C3C"),
+    axis.text.x = element_text(color = "gray30"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(size = 10, color = "gray40", hjust = 0),
+    plot.background = element_rect(fill = "white", color = NA)
+  ) +
+  expand_limits(y = max(top_genres$n) * 1.1)
+
+# Guardar el gráfico 
+ggsave("../Outputs/grafico_p2_2.png", grafico_p2_2, width = 10, height = 6, dpi = 300)
+```
+![Top 15 libros más populares](Outputs/grafico_p2_2.png)
+
+### 6.5 Comparación y conclusiones entre ambos gráficos
+
+El primer gráfico, basado en el dataset original, ofrece una visión amplia del panorama literario en Goodbooks-10k. Allí se observa una marcada predominancia de la ficción y los clásicos (184 títulos), que constituyen el núcleo central de la colección. Estos géneros, junto con la fantasía (134 libros) y la novela negra/misterio (69), concentran una proporción considerable del total, evidenciando la relevancia de la narrativa tradicional, las sagas fantásticas y las tramas de intriga entre los lectores de la plataforma.
+
+Otros géneros con presencia significativa son el romance (55 títulos), la literatura juvenil (43) y la ficción histórica (43), los cuales destacan por su conexión con públicos específicos —principalmente lectores jóvenes y aficionados a relatos emocionales o ambientados en contextos históricos reconocibles. En un nivel menor, la novela gráfica/cómic (34), el terror/sobrenatural (31), la ciencia ficción (28) y la literatura infantil (25) completan el top 10, revelando un interés diversificado pero centrado en géneros narrativos.
+
+El segundo gráfico, construido a partir del dataset filtrado (sin valores faltantes en las calificaciones), muestra una reducción drástica en la cantidad de registros válidos. Si bien la tendencia general se mantiene —la ficción y los clásicos continúan liderando—, la distribución se vuelve mucho más limitada, con una pérdida significativa de diversidad de géneros. Esto se debe a que 7.474 observaciones presentan valores faltantes en avg_rating y n_ratings, lo que reduce la representatividad del corpus al analizar solo los libros con valoración disponible.
+
+Esta comparación pone en evidencia un aspecto metodológico clave: el filtrado por completitud de datos puede sesgar los resultados hacia obras más populares o evaluadas, dejando fuera una gran parte del catálogo disponible en la plataforma. Por tanto, el análisis de géneros debe considerar esta diferencia para evitar interpretaciones distorsionadas sobre las preferencias lectoras.
+
+En síntesis, los resultados indican que el dataset Goodbooks-10k refleja un ecosistema literario fuertemente dominado por la ficción narrativa, especialmente por obras clásicas, fantásticas y de misterio, mientras que los géneros no narrativos o especializados ocupan un lugar marginal. La comparación entre la base original y la filtrada evidencia que la falta de calificaciones afecta la diversidad observada, concentrando aún más la muestra en los géneros con mayor visibilidad y popularidad entre los usuarios de Goodreads.
+
+En conjunto, estos hallazgos sugieren que la base de datos —aunque útil para explorar patrones de lectura— tiende a reproducir las dinámicas de consumo cultural predominantes en la plataforma: una fuerte preferencia por la narrativa de ficción universal y un menor interés en géneros informativos o de nicho.
+
+## 7. Entre el deseo y la visibilidad: el mapa del interés lector en Goodreads ✨📖
 
 En el ecosistema digital de Goodreads, no solo importan los libros que han sido leídos, sino también aquellos que los usuarios desean leer. Este análisis parte de una pregunta clave: **¿qué factores explican que ciertos títulos despierten una mayor expectativa lectora y sean añadidos con más frecuencia a las listas "to-read"?**
 
@@ -469,7 +730,7 @@ La variable `n_to_read` ofrece una mirada distinta a la dinámica del consumo cu
 
 Explorar esta variable permite comprender cómo se construye la visibilidad literaria antes incluso de que se produzca la lectura. En este sentido, el análisis combina una revisión descriptiva de los títulos más añadidos, la identificación de autores recurrentes y la observación de patrones de concentración (*“winner takes all”*), para indagar cómo se distribuye el interés lector y qué características comparten los libros con mayor potencial de atención.
 
-## 6.1 Limpieza y observaciones iniciales
+## 7.1 Limpieza y observaciones iniciales
 
 Antes de comenzar el análisis, se definieron las variables principales involucradas:
 
@@ -490,7 +751,7 @@ books_to_read <- books_full %>%
 # books_to_read contiene 655 obs. de 15 variables
 ```
 
-### 6.2 Objetivo analítico
+### 7.2 Objetivo analítico
 
 El propósito de esta sección es **caracterizar los libros con mayor interés potencial de lectura en Goodreads**, explorando los factores que inciden en su atractivo anticipado y su relación con la popularidad y la valoración crítica.
 
@@ -504,14 +765,14 @@ Concretamente, se busca responder a tres preguntas centrales:
 
 El análisis se abordará a través de visualizaciones descriptivas y reflexiones interpretativas que permiten vincular los resultados con dinámicas socioculturales del consumo literario digital.
 
-### 6.3 Visualización y análisis:
+### 7.3 Visualización y análisis:
 
-- [1. Identificación de los libros más marcados como “por leer”](#631-identificación-de-los-libros-más-marcados-como-por-leer)
-- [2. Autores con mayor presencia en las listas “to-read”](#632-qué-autores-aparecen-más-en-el-top-y-qué-tipo-de-obras-son)
-- [3. Distribución del interés lector y efecto “winner takes all”](#633-explorar-concentración-efecto-winner-takes-all)
+- [1. Identificación de los libros más marcados como “por leer”](#731-identificación-de-los-libros-más-marcados-como-por-leer)
+- [2. Autores con mayor presencia en las listas “to-read”](#732-qué-autores-aparecen-más-en-el-top-y-qué-tipo-de-obras-son)
+- [3. Distribución del interés lector y efecto “winner takes all”](#733-explorar-concentración-efecto-winner-takes-all)
 
 
-#### 6.3.1 Identificación de los libros más marcados como “por leer”
+#### 7.3.1 Identificación de los libros más marcados como “por leer”
 
 A continuación, se identifican los títulos con mayor número de usuarios que los agregaron a su lista “to-read”.
 
@@ -613,7 +874,7 @@ Junto a estas obras de culto, emergen algunos casos que se apartan de la lógica
 
 En conjunto, los resultados permiten concluir que los libros más añadidos a listas “to-read” tienden a ser obras canónicas o altamente visibles, reforzando la idea de que la popularidad potencial en Goodreads reproduce dinámicas de notoriedad cultural. En este sentido, el interés lector anticipado parece vincularse menos con la novedad editorial y más con el capital simbólico acumulado de ciertos títulos y autores.
 
-#### 6.3.2 ¿Qué autores aparecen más en el top y qué tipo de obras son?
+#### 7.3.2 ¿Qué autores aparecen más en el top y qué tipo de obras son?
 
 El objetivo de este análisis es identificar qué autores concentran la mayor cantidad de títulos dentro del subconjunto books_to_read. Esto permite observar si el interés lector se organiza en torno a autores “de culto” o sagas reconocidas, más que a géneros o temáticas específicas.
 
@@ -662,7 +923,7 @@ Esta concentración sugiere que las preferencias lectoras se articulan principal
 
 En conjunto, el patrón indica un fenómeno de reconocimiento de marca autoral: los usuarios tienden a añadir a sus listas “to-read” múltiples obras de los mismos escritores, reforzando la idea de que la visibilidad mediática y la familiaridad con el autor son factores determinantes en la formación de expectativas lectoras.
 
-#### 6.3.3 Explorar concentración (efecto “winner takes all”)
+#### 7.3.3 Explorar concentración (efecto “winner takes all”)
 
 Con el fin de complementar el análisis anterior, este apartado explora la distribución del número de usuarios que marcan los libros como “por leer” (`n_to_read`). El objetivo es observar si el interés potencial se reparte de manera equilibrada o si, por el contrario, unos pocos títulos concentran una proporción desproporcionada de la atención.
 
@@ -692,7 +953,7 @@ Este patrón refleja lo que en sociología y economía cultural se denomina fen�
 
 En el caso de Goodreads, este fenómeno sugiere que el interés por leer un libro no depende tanto de su calidad literaria o valoración crítica, sino de su capacidad para insertarse en redes de difusión y conversación. Así, unos pocos libros —generalmente best-sellers o sagas de culto— capturan la mayor parte del entusiasmo lector, consolidando un panorama de fuerte concentración simbólica donde la popularidad se convierte en un recurso escaso y autorreforzante.
 
-### 6.4 Conclusión pregunta 3
+### 7.4 Conclusión pregunta 3
 
 La pregunta que orientó este análisis — **¿qué factores caracterizan a los libros que concentran mayor interés potencial de lectura en Goodreads, y cómo se relacionan con su valoración y visibilidad dentro del dataset?**— permite comprender una dimensión clave del comportamiento lector contemporáneo: la manera en que los usuarios proyectan su atención y deseo antes de leer.
 
@@ -702,9 +963,11 @@ El análisis también evidencia un fenómeno de “winner takes all”, donde un
 
 En síntesis, los libros más marcados como “por leer” representan una intersección entre deseo, visibilidad y legitimidad cultural. Goodreads funciona así como un espejo del ecosistema editorial contemporáneo, donde las expectativas lectoras se moldean tanto por la curiosidad individual como por la fuerza de los circuitos de notoriedad colectiva. La anticipación del acto de leer se convierte en una práctica social en sí misma: una forma de participar en la cultura literaria global antes incluso de abrir un libro.
 
-## 7. Desarrollar pregunta 4
+## 8. Desarrollar pregunta 4
 
-## 8. Conclusiones finales
+
+
+## 9. Conclusiones finales
 
 
 
