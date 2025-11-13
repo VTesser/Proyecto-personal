@@ -398,7 +398,8 @@ grafico_p2_1 <- ggplot(top_genres_original, aes(x = reorder(genre_label, n), y =
 # Mostrar gráfico
 grafico_p2_1
 
-
+# Guardar salida
+ggsave("../Outputs/grafico_p2_1.png", grafico_p2_1, width = 10, height = 6, dpi = 300)
 ```
 
 ## 2. Grafico de distribucion con nuevo dataset 
@@ -548,15 +549,13 @@ En síntesis, los resultados indican que el dataset Goodbooks-10k refleja un eco
 En conjunto, estos hallazgos sugieren que la base de datos —aunque útil para explorar patrones de lectura— tiende a reproducir las dinámicas de consumo cultural predominantes en la plataforma: una fuerte preferencia por la narrativa de ficción universal y un menor interés en géneros informativos o de nicho.
 
 
-# PREGUNTA 3 - ¿Qué características destacan entre los títulos más añadidos a listas de lectura (“to-read”), y cómo se relacionan con la distribución general de géneros en el dataset filtrado?
+# PREGUNTA 3 - ¿Qué factores caracterizan a los libros que concentran mayor interés potencial de lectura en Goodreads, y cómo se relacionan con su valoración y visibilidad dentro del dataset?
 
-El propósito de esta pregunta es identificar los patrones comunes entre los libros que despiertan mayor interés potencial entre los lectores, expresado en el número de usuarios que los han marcado como “por leer” (n_to_read) en Goodreads.
+Esta pregunta busca identificar los elementos que explican por qué ciertos títulos generan una mayor expectativa lectora, expresada en el número de usuarios que los agregan a su lista “to-read” (`n_to_read`). 
 
-A diferencia de las variables que reflejan la experiencia de lectura (como avg_rating o n_ratings), esta métrica captura una dimensión anticipatoria del comportamiento lector: el deseo o expectativa de leer ciertos títulos en el futuro. Por ello, su análisis permite aproximarse a las preferencias proyectadas de la comunidad lectora.
+El análisis combina una revisión descriptiva de los títulos más añadidos, la presencia de autores recurrentes, y la relación entre popularidad potencial y valoración promedio (`avg_rating`), considerando además la concentración de atención (“winner takes all”) entre los títulos disponibles.
 
-Sin embargo, la base de datos presenta una alta proporción de valores faltantes en variables clave (avg_rating, n_ratings, n_to_read), lo que limita la cantidad de observaciones útiles.
-
-Para asegurar resultados más representativos y evitar sesgos, se trabajará únicamente con los registros completos, filtrando los valores NA en las tres variables mencionadas.
+A diferencia de las variables que reflejan la experiencia de lectura efectiva (como `avg_rating` o `n_ratings`), la variable `n_to_read` permite aproximarse a una dimensión anticipatoria del comportamiento lector: el deseo o proyección de lectura futura. 
 
 ```{r}
 books_to_read <- books_full %>%
@@ -579,173 +578,341 @@ top_to_read <- books_to_read %>%
 top_to_read
 ```
 
-## 2. Visualización 10 títulos “to-read”
+Visualizamos lo anterior en la siguiente tabla:
+
+### 1.1 Tabla de TOP 10 
 
 ```{r}
-# Barra del top10
-ggplot(top_to_read, aes(x = reorder(title, n_to_read), y = n_to_read)) +
-  geom_col(fill = "#2C3E50", width = 0.7) +
-  coord_flip() +
-  geom_text(aes(label = n_to_read), hjust = -0.1, size = 3.5, color = "gray20") +
-  labs(
-    title = "Top 10: libros más añadidos a listas 'to-read'",
-    x = NULL, y = "Usuarios que marcaron 'por leer'",
-    caption = "Fuente: Goodbooks-10k (subset: registros completos)"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(plot.title = element_text(face = "bold"))
+library(dplyr)
+library(gt)
+
+# Crear tabla GT
+tabla_top_to_read <- books_to_read %>%
+  arrange(desc(n_to_read)) %>%
+  select(
+    Título = title,
+    Autor = authors,
+    "Año de publicación" = original_publication_year,
+    "Valoración promedio" = avg_rating,
+    "N° de calificaciones" = n_ratings,
+    "Usuarios que marcaron 'por leer'" = n_to_read
+  ) %>%
+  head(10) %>%
+  gt() %>%
+  fmt_number(columns = c("Valoración promedio"), decimals = 2) %>%
+  fmt_number(columns = c("N° de calificaciones", "Usuarios que marcaron 'por leer'"),
+             decimals = 0, use_seps = TRUE) %>%
+  tab_header(
+    title = md("**Top 10 libros más marcados como 'por leer'**"),
+    subtitle = md("Fuente: Dataset Goodbooks-10k (Kaggle) | Elaboración: *Valentina Tesser*")
+  ) %>%
+  tab_style(style = cell_text(weight = "bold"),
+            locations = cells_column_labels()) %>%
+  tab_options(
+    table.border.top.width = 2,
+    table.border.top.color = "#F7C6C7",
+    table.border.bottom.color = "#F7C6C7",
+    table.background.color = "white",
+    heading.background.color = "#F9EAEA",
+    column_labels.background.color = "#F2F2F2",
+    table.font.names = "Helvetica",
+    data_row.padding = px(5)
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FDF7F7"),
+    locations = cells_body(rows = seq(1, 10, 2))
+  )
+
+# Guardar como imagen
+gtsave(tabla_top_to_read, "../Outputs/tabla_top_to_read.png")
 ```
-Explicación: este gráfico visualiza quiénes son los títulos que concentran mayor expectativa. Te permite ver si hay un “winner takes all” (muy pocos con muchísimos marcados) o una cola larga.
 
-Interpretación a partir de tu top_to_read (títulos que reportaste):
+Asi mismo, podemos visualizar la información presentada en un gráfico de barras: 
 
-Aparecen obras muy visibles/“de culto”: The Hitchhiker's Guide..., The Lord of the Rings (colecciones y art books), varias entregas de Harry Potter, Notes from a Small Island (travel/humor), y The Salmon of Doubt (Douglas Adams).
-
-Conclusión preliminar: los títulos más añadidos suelen ser obras canónicas, sagas o colecciones vinculadas a autores/series muy visibles. También aparecen libros de formato “art book” o recopilaciones (p. ej. The Lord of the Rings: The Art of...), que atraen por su componente visual/coleccionista.
-
-## 3. ¿Qué autores aparecen más en el top y qué tipo de obras son?
+### 1.2 Visualización 10 títulos “to-read”
 
 ```{r}
-# Autores del top10
-top_to_read %>%
-  count(authors, sort = TRUE)
+# Barra horizontal del top 10 "to-read"
 
-# Autores más frecuentes en el subconjunto completo
+gráfico_top_to_read <- ggplot(top_to_read, aes(x = reorder(title, n_to_read), y = n_to_read)) +
+geom_col(fill = "pink", width = 0.7) +
+geom_text(aes(label = scales::comma(n_to_read)),
+hjust = -0.1, size = 3.5, color = "gray20") +
+coord_flip() +
+labs(
+title = "Top 10 libros más añadidos a listas 'to-read'",
+subtitle = "Los títulos con mayor expectativa lectora según número de usuarios",
+x = NULL,
+y = "Usuarios que marcaron 'por leer'",
+caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
+) +
+theme_minimal(base_size = 12) +
+theme(
+plot.title = element_text(face = "bold", size = 13),
+plot.subtitle = element_text(color = "gray40"),
+axis.text.y = element_text(size = 10)
+) +
+expand_limits(y = max(top_to_read$n_to_read) * 1.15)
+
+## Guardar gráfico 
+
+ggsave("../Outputs/gráfico_top_to_read.png", gráfico_top_to_read, width = 10, height = 6, dpi = 300)
+
+```
+
+El gráfico permite identificar los títulos que concentran una mayor expectativa lectora dentro del conjunto analizado, es decir, aquellos que más usuarios han añadido a sus listas `to-read`. Se observa una clara concentración en unos pocos libros que acumulan un número significativamente mayor de marcas “por leer”, lo que sugiere un patrón de tipo winner takes all, donde la atención se distribuye de forma desigual entre un pequeño grupo de obras altamente reconocidas.
+
+Los resultados muestran una fuerte presencia de sagas literarias y universos narrativos consolidados, destacando las series The Hitchhiker’s Guide to the Galaxy, Harry Potter y The Lord of the Rings. Esta tendencia indica que la popularidad potencial se asocia estrechamente a títulos que ya cuentan con una base de lectores fieles y con una fuerte visibilidad mediática. Asimismo, aparecen ediciones especiales o complementarias —como The Lord of the Rings: The Art of the Fellowship of the Ring o Harry Potter Collection— que revelan un interés no solo por la lectura en sí, sino también por el componente coleccionable y simbólico de ciertos volúmenes.
+
+Junto a estas obras de culto, emergen algunos casos que se apartan de la lógica dominante, como The Known World o Notes from a Small Island, que pertenecen a géneros más realistas (ficción histórica y literatura de viajes, respectivamente). Su presencia sugiere que la expectativa lectora también puede responder a factores de prestigio crítico o a la trayectoria de autores reconocidos, más allá de la popularidad de una saga.
+
+En conjunto, los resultados permiten concluir que los libros más añadidos a listas “to-read” tienden a ser obras canónicas o altamente visibles, reforzando la idea de que la popularidad potencial en Goodreads reproduce dinámicas de notoriedad cultural. En este sentido, el interés lector anticipado parece vincularse menos con la novedad editorial y más con el capital simbólico acumulado de ciertos títulos y autores.
+
+## 2. ¿Qué autores aparecen más en el top y qué tipo de obras son?
+
+El objetivo de este análisis es identificar qué autores concentran la mayor cantidad de títulos dentro del subconjunto books_to_read. Esto permite observar si el interés lector se organiza en torno a autores “de culto” o sagas reconocidas, más que a géneros o temáticas específicas.
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Calcular los autores más frecuentes
 authors_freq <- books_to_read %>%
-  mutate(main_author = authors) %>% # ajustar si necesitas parsear múltiples autores
+  mutate(main_author = authors) %>%
   count(main_author, sort = TRUE) %>%
   slice_head(n = 10)
 
-authors_freq
+# Gráfico en tonos morados
+grafico_top_autores <- ggplot(authors_freq, aes(x = reorder(main_author, n), y = n)) +
+  geom_col(fill = "#8E44AD", width = 0.7) +
+  geom_text(aes(label = n), hjust = -0.1, color = "#4A235A", size = 3.5) +
+  coord_flip() +
+  labs(
+    title = "Autores con más títulos marcados como 'por leer'",
+    subtitle = "Subset: registros completos (`books_to_read`)",
+    x = NULL,
+    y = "Número de títulos",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", color = "#4A235A"),
+    plot.subtitle = element_text(color = "gray30"),
+    panel.grid.major.y = element_blank(),
+    axis.text = element_text(color = "#2C2C2C"),
+    plot.caption = element_text(size = 8, color = "gray40", face = "italic")
+  )
 
-ggplot(authors_freq, aes(x = reorder(main_author, n), y = n)) +
-  geom_col(fill = "#6A1B9A") + coord_flip() +
-  labs(title = "Top autores (subset books_to_read)", x = NULL, y = "Número de títulos") +
-  theme_minimal()
+# Mostrar gráfico
+grafico_top_autores
+
+# Guardar gráfico
+ggsave("../Outputs/grafico_top_autores.png", grafico_top_autores, width = 8, height = 5, dpi = 300)
 
 ```
 
-Explicación: analizar autores ayuda a identificar si el interés “to-read” agrupa obras de autores concretos (sagas, nombres de marca) en lugar de géneros sueltos.
 
-Interpretación preliminar: tus top incluyen varios textos de autores o sagas con fandom (Adams, Tolkien, Rowling). Esto sugiere que la visibilidad del autor/serie y el carácter “clásico/popular” influyen fuertemente en n_to_read.
+El gráfico muestra a los autores con mayor presencia dentro del subconjunto de libros marcados como “por leer”. Se destacan Kurt Vonnegut Jr., John Grisham, Janet Evanovich, Douglas Adams y Patricia Cornwell, quienes lideran el interés con entre 9 y 15 títulos cada uno.
+
+Esta concentración sugiere que las preferencias lectoras se articulan principalmente en torno a nombres consolidados o franquicias literarias, más que a obras individuales o géneros emergentes. En particular, Vonnegut y Adams representan autores de culto con estilos narrativos distintivos y comunidades lectoras fieles, mientras que Grisham, Cornwell y Evanovich destacan por su producción prolífica y popularidad comercial dentro de la ficción contemporánea.
+
+En conjunto, el patrón indica un fenómeno de reconocimiento de marca autoral: los usuarios tienden a añadir a sus listas “to-read” múltiples obras de los mismos escritores, reforzando la idea de que la visibilidad mediática y la familiaridad con el autor son factores determinantes en la formación de expectativas lectoras.
 
 
-## 4. Análisis de relación entre popularidad potencial y valoración (`avg_rating`)
+## 3. Análisis de relación entre popularidad potencial y valoración (`avg_rating`)
 
-El objetivo de este análisis es explorar si los libros que más usuarios agregan a sus listas “to-read” tienden a coincidir con aquellos mejor valorados en Goodreads. Esto permite examinar la relación entre expectativa lectora y aprecio consolidado.
+El objetivo de este análisis es examinar si los libros más agregados a listas “to-read” también son los mejor valorados en Goodreads. Esto permite evaluar hasta qué punto la expectativa lectora (interés previo) coincide con el aprecio consolidado (valoración posterior), diferenciando entre fama y reputación crítica.
 
-Se trabajan solo los registros completos (`books_to_read`) para asegurar que tanto la popularidad potencial como la valoración estén disponibles.
+### 3.1 Scatterplot con línea de tendencia (geom_smooth)
 
-Considerar que son un total de 67 obs en `books_to_read`
+El siguiente gráfico presenta la relación entre la valoración promedio (`avg_rating`) y el número de usuarios que marcaron el libro como “por leer” (`n_to_read`).
 
-### 4.1 Scatterplot con línea de tendencia (geom_smooth)
-
-El primer gráfico muestra cada libro como un punto según su avg_rating (x) y n_to_read (y).
-
-La línea de regresión indica la relación general entre valoración y popularidad anticipada.
-
-Interpretación: aunque hay una ligera tendencia positiva, la relación no es perfecta; algunos libros con altísima expectativa no necesariamente tienen la valoración más alta, evidenciando que el interés lector puede depender de visibilidad, saga o autor más que de calidad percibida.
+Cada punto representa un libro, mientras que la línea naranja de regresión muestra la tendencia general según un modelo lineal.
 
 ```{r}
-ggplot(books_to_read, aes(x = avg_rating, y = n_to_read)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", color = "#E67E22") +
+library(ggplot2)
+
+grafico_relacion_popularidad <- ggplot(books_to_read, aes(x = avg_rating, y = n_to_read)) +
+  geom_point(alpha = 0.6, color = "#0B5345", size = 3) +
+  geom_smooth(method = "lm", color = "#E67E22", linewidth = 1.2, se = TRUE) +
   labs(
     title = "Relación entre valoración promedio y popularidad anticipada",
+    subtitle = "Cada punto representa un libro con registro completo en Goodreads",
     x = "Promedio de valoración (avg_rating)",
-    y = "Usuarios que marcaron 'por leer'"
+    y = "Usuarios que marcaron 'por leer'",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", color = "#2C2C2C", size = 14),
+    plot.subtitle = element_text(color = "gray30"),
+    axis.text = element_text(color = "#2C2C2C"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(size = 8, color = "gray40", face = "italic")
+  )
+
+grafico_relacion_popularidad
+
+# Guardar el gráfico en Outputs
+ggsave("../Outputs/grafico_relacion_popularidad.png",
+       grafico_relacion_popularidad,
+       width = 9, height = 6, dpi = 300)
+
 ```
 
-### 4.2 Scatterplot con tamaño proporcional a n_ratings
+El gráfico evidencia una relación positiva débil entre el promedio de valoración de los libros y el número de usuarios que los marcan como “por leer”. La pendiente apenas ascendente de la línea de tendencia sugiere que, en general, los títulos con mejores calificaciones tienden a atraer a más lectores potenciales, aunque la asociación no es lineal ni particularmente fuerte.
 
-Aquí el tamaño de los puntos refleja cuántas personas han calificado cada libro (n_ratings).
+Se observan muchos libros con valoración media (entre 3.5 y 4.0) que concentran un rango muy amplio de interés, desde apenas unos pocos registros hasta más de 1500 usuarios. Esto indica que la expectativa lectora no depende exclusivamente de la calidad percibida, sino también de otros factores contextuales, como la popularidad del autor, la existencia de sagas, o el impacto cultural y mediático de ciertos títulos.
 
-Interpretación: permite ver simultáneamente popularidad anticipada, valoración promedio y visibilidad real en la plataforma. Los libros con más ratings suelen coincidir con los más agregados a listas “to-read”, reforzando la idea de que los títulos más conocidos o “de culto” generan más expectativa.
+En otras palabras, mientras las obras con alta valoración suelen mantener un interés sostenido, la popularidad anticipada parece estar más vinculada a la visibilidad social del libro que a su evaluación crítica. Este hallazgo coincide con el comportamiento típico de plataformas como Goodreads, donde las dinámicas de recomendación, tendencia y fandom pueden influir tanto o más que las métricas de calidad.
+
+
+### 3.2 Relación entre valoración promedio, popularidad anticipada y visibilidad (`n_ratings`)
+
+El siguiente gráfico añade una tercera dimensión al análisis: el tamaño de los puntos representa el número de calificaciones (`n_ratings`) que ha recibido cada libro, permitiendo visualizar simultáneamente popularidad anticipada (`n_to_read`), valoración promedio (`avg_rating`) y visibilidad efectiva en la plataforma.
 
 ```{r}
-ggplot(books_to_read, aes(x = avg_rating, y = n_to_read, size = n_ratings)) +
-  geom_point(alpha = 0.6, color = "#E74C3C") +
+gráfico_pop_vs_valor_promedio <- ggplot(books_to_read, aes(x = avg_rating, y = n_to_read, size = n_ratings)) +
+  geom_point(alpha = 0.6, color = "#1B5E20") +
   scale_size_continuous(name = "Número de ratings") +
   labs(
-    title = "Popularidad potencial vs. valoración promedio",
+    title = "Popularidad potencial vs. valoración promedio y visibilidad",
     x = "Promedio de valoración (avg_rating)",
-    y = "Usuarios que marcaron 'por leer'"
+    y = "Usuarios que marcaron 'por leer'",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "bottom"
+  )
+
+gráfico_pop_vs_valor_promedio
+
+# Guardar el gráfico en Outputs
+ggsave("../Outputs/gráfico_pop_vs_valor_promedio.png",
+       gráfico_pop_vs_valor_promedio,
+       width = 9, height = 6, dpi = 300)
 
 ```
 
-### 4.3 Hexbin plot
+El gráfico muestra que los libros con mayor cantidad de calificaciones tienden también a ser los más añadidos a las listas “por leer”, evidenciando una relación entre visibilidad y expectativa lectora.
 
-Cada hexágono muestra la densidad de libros en rangos de avg_rating y n_to_read.
+Aunque existen algunos títulos con alta valoración pero baja notoriedad —indicando interés de nichos más pequeños—, la tendencia general sugiere que la popularidad potencial se concentra en obras ampliamente difundidas o de culto.
 
-Interpretación: la mayoría de los libros se concentra en valores medios-altos de valoración y popularidad moderada. Los títulos con valores muy altos de n_to_read destacan claramente como “outliers”, normalmente colecciones o sagas de alto reconocimiento.
+Esto refuerza la idea de que el interés por leer un libro no depende solo de su calidad percibida, sino también de factores sociales, mediáticos y de reconocimiento del autor o la saga
+
+
+### 3.3 Densidad de libros por valoración y popularidad potencial
+
+Cada hexágono representa un conjunto de libros agrupados por niveles similares de valoración promedio (`avg_rating`) y de usuarios que los marcaron como “por leer”. La intensidad del color indica la cantidad de títulos en cada rango.
 
 ```{r}
 library(ggplot2)
 library(hexbin)
 
-
-ggplot(books_to_read, aes(x = avg_rating, y = n_to_read)) +
+grafico_densidad <- ggplot(books_to_read, aes(x = avg_rating, y = n_to_read)) +
   geom_hex(bins = 30) +
-  scale_fill_viridis_c(option = "C") +
+  scale_fill_viridis_c(option = "D", direction = 1, name = "Cantidad de libros") +
   labs(
     title = "Densidad de libros por valoración y popularidad potencial",
-    x = "Promedio de valoración",
+    subtitle = "Cada hexágono agrupa títulos con valores similares de rating y expectativa lectora",
+    x = "Promedio de valoración (avg_rating)",
     y = "Usuarios que marcaron 'por leer'",
-    fill = "Cantidad de libros"
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
   ) +
-  theme_minimal()
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.subtitle = element_text(size = 10, color = "gray40"),
+    legend.position = "right"
+  )
+
+# Guardar salida
+ggsave("../Outputs/grafico_densidad_bivariada.png", grafico_densidad, width = 10, height = 6, dpi = 300)
+
+grafico_densidad
 
 ```
 
-### 4.4 Conclusiones e interpretaciones 
+La densidad observada revela que la mayoría de los libros se agrupa en valoraciones entre 3.5 y 4.2, con una popularidad moderada (menos de 500 usuarios que los marcaron como “por leer”).
 
+Solo unos pocos títulos —visibles en los hexágonos superiores— alcanzan niveles excepcionalmente altos de interés, configurando outliers asociados a sagas o autores muy reconocidos.
 
+Esto sugiere que, dentro del universo de Goodreads, la expectativa lectora se distribuye de forma desigual, con una concentración en títulos de visibilidad media y una cúspide pequeña dominada por franquicias literarias consolidadas.
+
+### 3.4 Conclusiones e interpretaciones 
+
+El análisis conjunto de los tres gráficos permite identificar patrones claros sobre los factores que explican el interés potencial de lectura en Goodreads y su relación con la valoración y visibilidad de los libros.
+
+En primer lugar, la relación entre la valoración promedio y la popularidad anticipada muestra una correlación positiva, aunque débil, lo que indica que los libros mejor calificados suelen atraer algo más de atención, pero la calidad percibida no es el principal motor del interés lector. La tendencia general sugiere que la decisión de añadir un libro a la lista “por leer” no depende exclusivamente del promedio de calificaciones, sino de elementos externos a la experiencia individual de lectura.
+
+El análisis bivariado que incorpora el número de calificaciones (n_ratings) refuerza esta idea: los títulos más visibles —aquellos con miles de ratings acumulados— son también los que concentran la mayor expectativa. Esto evidencia el efecto de retroalimentación social o “popularidad acumulativa”, donde la exposición mediática, el boca a boca o la pertenencia a sagas reconocidas potencian la notoriedad de ciertas obras, independientemente de su valoración crítica. En otras palabras, la visibilidad se convierte en un factor explicativo clave del interés potencial.
+
+Finalmente, la distribución de densidad muestra un ecosistema altamente concentrado, donde la mayoría de los libros se agrupa en valoraciones medias-altas y niveles moderados de interés, mientras que un pequeño grupo de outliers domina las listas de deseo. Estos casos excepcionales suelen corresponder a franquicias literarias, autores icónicos o títulos con presencia transversal en la cultura popular, que generan un atractivo más simbólico o identitario que literario.
+
+En síntesis, los libros que concentran mayor interés potencial en Goodreads combinan tres dimensiones principales:
+
+  - Alta visibilidad social y mediática, que amplifica su alcance más allá de los circuitos literarios.
+
+  - Pertenencia a sagas, colecciones o autores de culto, que aseguran reconocimiento inmediato.
+
+  - Valoraciones positivas, aunque no necesariamente excepcionales, que funcionan más como una validación del interés que como su causa.
+
+Este patrón sugiere que en Goodreads —como en otros ecosistemas digitales— la popularidad anticipada responde más a dinámicas de visibilidad y comunidad que a juicios estrictamente literarios, revelando cómo la lectura se inserta también en lógicas de consumo cultural y reputación compartida.
+
+## 4. Explorar concentración (efecto “winner takes all”)
+
+Con el fin de complementar el análisis anterior, este apartado explora la distribución del número de usuarios que marcan los libros como “por leer” (`n_to_read`). El objetivo es observar si el interés potencial se reparte de manera equilibrada o si, por el contrario, unos pocos títulos concentran una proporción desproporcionada de la atención.
+
+```{r}
+winner_takes_all <- ggplot(books_to_read, aes(x = n_to_read)) +
+geom_histogram(bins = 30, fill = "#5f0f40", color = "white") +
+scale_x_log10() +
+labs(
+title = "Distribución de 'n_to_read' (escala logarítmica)",
+subtitle = "La mayoría de los libros tiene pocos usuarios interesados, mientras unos pocos concentran gran atención",
+x = "Usuarios que marcaron 'por leer' (log10)",
+y = "Frecuencia de títulos",
+caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
+) +
+theme_minimal(base_size = 12)
+
+winner_takes_all
+
+# Guardar salida
+ggsave("../Outputs/winner_takes_all.png", winner_takes_all, width = 10, height = 6, dpi = 300)
+
+```
+
+El histograma con escala logarítmica revela una distribución fuertemente sesgada del interés lector. La mayor parte de los libros cuenta con pocos usuarios que los han marcado como “por leer”, mientras que un grupo muy reducido concentra niveles extraordinarios de atención. Esto indica que, dentro del catálogo de Goodreads, el interés potencial se distribuye de manera desigual: la visibilidad y el deseo lector tienden a acumularse en unos pocos títulos de alto reconocimiento, mientras la mayoría permanece en la periferia.
+
+Este patrón refleja lo que en sociología y economía cultural se denomina fenómeno winner takes all (literalmente, “el ganador se lleva todo”). Se trata de un tipo de dinámica en la que pequeñas diferencias iniciales en popularidad o exposición —por ejemplo, la fama del autor, la adaptación cinematográfica o el marketing— se amplifican a través de mecanismos de retroalimentación social. En entornos digitales, los algoritmos de recomendación, las reseñas masivas y la visibilidad en rankings tienden a reforzar el éxito de los títulos más vistos, generando un círculo virtuoso de atención para unos pocos y un efecto de invisibilidad para la mayoría.
+
+En el caso de Goodreads, este fenómeno sugiere que el interés por leer un libro no depende tanto de su calidad literaria o valoración crítica, sino de su capacidad para insertarse en redes de difusión y conversación. Así, unos pocos libros —generalmente best-sellers o sagas de culto— capturan la mayor parte del entusiasmo lector, consolidando un panorama de fuerte concentración simbólica donde la popularidad se convierte en un recurso escaso y autorreforzante.
 
 ## 5. Conclusión pregunta 3
 
+A partir del análisis realizado, es posible responder a la pregunta “¿Qué factores caracterizan a los libros que concentran mayor interés potencial de lectura en Goodreads, y cómo se relacionan con su valoración y visibilidad dentro del dataset?”.
 
+Los resultados permiten concluir que el interés potencial de lectura en Goodreads —medido a través del número de usuarios que marcan un libro como “por leer” (`n_to_read`)— no se distribuye de manera uniforme ni responde principalmente a criterios de valoración literaria. Más bien, se organiza en torno a dinámicas de visibilidad, reconocimiento y acumulación simbólica, propias de los entornos digitales y culturales contemporáneos.
+
+En primer lugar, el análisis descriptivo mostró que los títulos con mayor número de usuarios interesados pertenecen, en su mayoría, a sagas literarias consolidadas o autores de culto (como Harry Potter, The Lord of the Rings o The Hitchhiker’s Guide to the Galaxy). Estos casos no solo reflejan éxito editorial, sino también una base de lectores previa y una fuerte presencia mediática, lo que refuerza la idea de que el deseo lector anticipado se construye socialmente a partir del prestigio acumulado y la familiaridad simbólica.
+
+En segundo lugar, la relación entre popularidad anticipada y valoración promedio (`avg_rating`) resultó positiva pero débil: los libros más bien calificados tienden a despertar algo más de interés, aunque no necesariamente son los más esperados. Esto sugiere que la expectativa de lectura no se origina en la calidad percibida, sino en factores externos como la difusión, la narrativa colectiva o la identidad de la comunidad lectora. A su vez, el número de calificaciones (`n_ratings`) se reveló como un indicador clave de visibilidad: los libros más comentados y calificados son también los más deseados, evidenciando un efecto de retroalimentación social donde la notoriedad genera más notoriedad.
+
+Finalmente, la distribución del interés lector confirma un claro efecto “winner takes all”, donde unos pocos títulos concentran una proporción desmedida de la atención, mientras la mayoría permanece con niveles bajos de visibilidad. Este patrón de concentración es típico de los mercados culturales digitales, en los que las plataformas y algoritmos tienden a amplificar el éxito inicial de ciertos productos, creando jerarquías simbólicas difíciles de revertir.
+
+En conjunto, los factores que caracterizan a los libros con mayor interés potencial en Goodreads pueden resumirse en tres dimensiones interrelacionadas:
+
+  - *Visibilidad acumulada*: el número de calificaciones y reseñas aumenta la exposición del libro y atrae a nuevos lectores potenciales.
+
+  - *Reconocimiento de marca autoral o de saga*: la familiaridad con un universo narrativo o un autor reconocido funciona como anclaje de confianza y deseo lector.
+
+  - *Efectos de concentración simbólica*: pequeños impulsos iniciales (premios, adaptaciones, fandoms) se amplifican mediante la dinámica de recomendación y validación social.
+
+Así, el interés lector anticipado en Goodreads opera más como un reflejo de las lógicas de popularidad y circulación cultural que como una medida directa de valor literario. En este sentido, el fenómeno observado evidencia cómo la lectura —incluso antes de concretarse— se ve mediada por procesos de visibilidad digital, pertenencia colectiva y construcción social del prestigio cultural.
 
 # PREGUNTA 4 - ¿Cómo varían las calificaciones y reseñas según el género, autor y año de publicación?
 
-
-
-pero como vamos hacer esto: Para identificar los géneros mejor valorados por los lectores, se calculó el promedio y la desviación estándar de las calificaciones (avg_rating) en cada categoría. Además, se filtraron los géneros con menos de 20 libros, con el fin de evitar sesgos por baja representatividad. recuerda que llos resultados sin NA en vaa ratn es de : 
-
-```{r}
-# Filtrar libros con datos válidos y limpiar etiquetas no literarias
-books_to_read <- books_to_read %>%
-  filter(!tag_name %in% c("to-read", "favorites", "currently-reading", "paulo-coelho")) %>%
-  mutate(
-    # Unificar etiquetas equivalentes
-    tag_name = case_when(
-      tag_name == "sci-fi" ~ "science-fiction",
-      TRUE ~ tag_name
-    )
-  )
-
-
-# Crear etiquetas legibles en español
-books_to_read <- books_to_read %>%
-  mutate(
-    genre_label = recode(tag_name,
-      "classics" = "Clásicos",
-      "fantasy" = "Fantasía",
-      "fiction" = "Ficción",
-      "historical-fiction" = "Ficción histórica",
-      "history" = "Historia",
-      "humor" = "Humor",
-      "noir" = "Novela negra",
-      "non-fiction" = "No ficción",
-      "science-fiction" = "Ciencia ficción",
-      "science" = "Ciencia",
-      "travel" = "Viajes"
-    )
-  )
-
-sort(unique(books_to_read$genre_label))
-```
 
