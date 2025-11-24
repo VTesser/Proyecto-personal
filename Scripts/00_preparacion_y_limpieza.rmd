@@ -3,6 +3,8 @@ title: "Fase 1-Proyecto personal"
 author: "Valentina Tesser"
 date: "2025-10-20"
 output: html_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
@@ -13,13 +15,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Exploración de base de datos para proyecto personal de Datos Magister. La idea de la investigación es sacar datos de GOODREADS y analizar los libros mas populares por genero, autor, año, etc. 
 
-Pregunta de investigacion central: ¿Cuales son los libros mas populares en GOODREADS y que patrones se pueden identificar en terminos de genero, autor y año de publicacion?
+* Pregunta de investigacion central: ¿Cuales son los libros mas populares en GOODREADS y que patrones se pueden identificar en terminos de genero, autor y año de publicacion?
 
-Segunda pregunta de investigación: ¿Cómo varian las calificaciones y reseñas de los libros segun su genero y autor?
+* Segunda pregunta de investigación: ¿Cómo varian las calificaciones y reseñas de los libros segun su genero y autor?
 
-Tercera pregunta de investigación: ¿Existe alguna correlacion entre el año de publicacion y la popularidad de los libros en GOODREADS?
+* Tercera pregunta de investigación: ¿Existe alguna correlacion entre el año de publicacion y la popularidad de los libros en GOODREADS?
 
-Cuarta pregunta de investigacion: ¿Cuales son los autores mas populares en GOODREADS y que caracteristicas comparten sus obras?
+* Cuarta pregunta de investigacion: ¿Cuales son los autores mas populares en GOODREADS y que caracteristicas comparten sus obras?
 
 # 1.Librerias 
 
@@ -29,6 +31,10 @@ library(ggplot2)
 library(readr)
 library(dplyr)
 library(summarytools)
+
+source("../R/99-funciones.R")
+options(digits = 5)
+
 ```
 
 
@@ -37,34 +43,37 @@ library(summarytools)
 
 Goodbooks-10k dataset
 
-Books.csv: Este archivo contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
+* Books.csv: Este archivo contiene información sobre los libros, incluyendo sus títulos, autores, años de publicación y calificaciones promedio.
 
-books.tags.csv: Este archivo contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
+* books.tags.csv: Este archivo contiene etiquetas asociadas a los libros, que pueden ayudar a categorizar y analizar los géneros y temas de los libros.
 
-ratings.csv: Este archivo contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
+* ratings.csv: Este archivo contiene las calificaciones que los usuarios han dado a los libros, lo que permite analizar la popularidad y recepción de los libros.
 
-tags.csv: Este archivo contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
+* tags.csv: Este archivo contiene las etiquetas que los usuarios han asignado a los libros, lo que puede proporcionar información adicional sobre los temas y géneros de los libros.
 
-to_read.csv: Este archivo contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
+* to_read.csv: Este archivo contiene una lista de libros que los usuarios han marcado para leer en el futuro, lo que puede proporcionar información sobre las tendencias y preferencias de lectura.
 
 ```{r}
 #Importar datos
 
-books <- read_csv("Base datos en bruto/books.csv")
-View(books)
+books <- read_csv("Data/books.csv")
 
-book_tags <- read_csv("Base datos en bruto/book_tags.csv")
-View(book_tags)
+book_tags <- read_csv("Data/book_tags.csv")
 
-ratings <- read_csv("Base datos en bruto/ratings.csv")
-View(ratings)
+ratings <- read_csv("Data/ratings.csv")
 
-tags <- read_csv("Base datos en bruto/tags.csv")
-View(tags)
+tags <- read_csv("Data/tags.csv")
 
-to_read <- read_csv("Base datos en bruto/to_read.csv")
-View(to_read)
+to_read <- read_csv("Data/to_read.csv")
 
+```
+
+Recomendación:
+
+```{r}
+carga_bases_multiples("../Data", 
+                      pattern = "\\.csv$", 
+                      reader = readr::read_csv)
 ```
 
 
@@ -98,6 +107,23 @@ summary(to_read)
 dim(to_read)
 ```
 
+Recomendación:
+
+```{r}
+skimr::skim(books)
+```
+
+Igual te recomiendo ver bien qué tipo de variables hay. Si bien no las usas todas al final, hay varias variables que "pasan" como numéricas que son, en verdad, números únicos de identificación.
+
+```{r}
+books <- books |> 
+  mutate(across(c(book_id, goodreads_book_id, best_book_id, work_id,
+                  isbn, isbn13), ~ as.character(.)))
+```
+
+```{r}
+skimr::skim(books)
+```
 
 # 4. Explorar rango temporal de los libros
 
@@ -122,7 +148,7 @@ books %>%
 
 Apuntes
 
-- se presentan NA en la base de datos books (en original_publication_year, isbn, isbn13, language_code, original_title)
+- Se presentan NA en la base de datos books (en original_publication_year, isbn, isbn13, language_code, original_title)
 - En book_tags hay 6 filas duplicadas (revisar)
 
 
@@ -143,6 +169,15 @@ sum(duplicated(book_tags))   # 6 duplicados (revisar)
 sum(duplicated(to_read))
 
 ```
+Recomendación:
+
+
+```{r}
+goodreads_bases <- c("book_tags", "books", "ratings", "tags", "to_read")
+
+remover_duplicados_env(goodreads_bases)
+```
+
 
 # 6. Revisar valores únicos importantes
 
@@ -202,6 +237,7 @@ to_read %>%
 
 # Libros más marcados "por leer"
 to_read %>%
+  mutate(book_id = as.character(book_id)) |> 
   group_by(book_id) %>%
   summarise(veces_por_leer = n()) %>%
   arrange(desc(veces_por_leer)) %>%
@@ -228,7 +264,6 @@ Apuntes:
 books <- books %>%
   filter(!is.na(original_publication_year)) %>%
   filter(original_publication_year >= 1800 & original_publication_year <= 2017)
-
 ```
 
 
@@ -342,6 +377,7 @@ write.csv(tags_clean, "tags_clean.csv", row.names = FALSE)
 write.csv(ratings_clean, "ratings_clean.csv", row.names = FALSE)
 write.csv(to_read_clean, "to_read_clean.csv", row.names = FALSE)
 ```
+
 
 
 

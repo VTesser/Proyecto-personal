@@ -9,6 +9,24 @@ output: html_document
 knitr::opts_knit$set(root.dir = getwd())
 ```
 
+Librerías:
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(forcats)
+library(stringr)
+library(scales)
+
+library(plotly)
+library(htmlwidgets)
+
+library(gt)
+
+library(hexbin)
+```
+
+
 # Fase 3 - Exploración descriptiva de datos de Goodreads
 
 Preguntas de investigación: 
@@ -46,7 +64,7 @@ Esta base contiene todos los libros limpios y preparados para análisis, con las
 - n_to_read: número de usuarios que marcaron el libro como "por leer"
 
 ```{r}
-books_full <- read_csv("~/Desktop/Universidad 2025/Datos magister/Proyecto personal/Data Limpia/books_final_integrated.csv")
+books_full <- read_csv("../Input/books_final_integrated.csv")
 
 # Vista previa de la base
 head(books_full)
@@ -70,8 +88,7 @@ El siguiente gráfico muestra cómo se distribuyen los libros en función de su 
 
 
 ```{r}
-library(ggplot2)
-library(dplyr)
+
 
 books_clean <- books_full %>%
   filter(!is.na(avg_rating), !is.na(n_ratings))
@@ -109,11 +126,7 @@ Igualmente, podemos ver mejor los datos en el siguiente gráfico:
 
 
 ```{r}
-library(plotly)
-library(ggplot2)
-library(dplyr)
-library(scales)
-library(htmlwidgets)
+
 
 p <- ggplot(books_clean, aes(
   x = n_ratings,
@@ -155,27 +168,8 @@ Donde observamos la misma tendencia que en el gráfico anterior, pero con la ven
 
 El gráfico siguiente muestra la concentración de títulos en torno a ciertos rangos de popularidad y valoración promedio.
 
-```{r}
-install.packages(c(
-  "tidyverse",
-  "dplyr",
-  "ggplot2",
-  "readr",
-  "tidyr",
-  "summarytools",
-  "plotly",
-  "scales",
-  "htmlwidgets",
-  "forcats",
-  "stringr"
-))
-```
-
-
 
 ```{r}
-library(ggplot2)
-library(scales) 
 
 grafico_densidad <- ggplot(books_clean, aes(x = n_ratings, y = avg_rating)) +
   geom_bin2d(bins = 30) +
@@ -233,12 +227,6 @@ En otras palabras, los libros más populares tienden a tener ligeramente mejores
 Finalmente, podemos visualizar los títulos que lideran ambos rankings y comparar si coinciden o no.
 
 ```{r}
-
-library(dplyr)
-library(ggplot2)
-library(forcats)
-library(stringr)
-library(scales)
 
 # Libros más populares
 top_popular <- books_clean %>%
@@ -420,8 +408,6 @@ Este filtrado reduce el tamaño de la muestra pero mejora su consistencia analí
 
 
 ```{r}
-library(dplyr)
-library(ggplot2)
 
 books_genres <- books_full %>%
 filter(!is.na(avg_rating), !is.na(tag_name))
@@ -494,9 +480,6 @@ books_genres <- books_genres %>%
       "travel" = "Viajes"
     )
   )
-
-library(dplyr)
-library(ggplot2)
 
 # Calcular frecuencia
 top_genres <- books_genres %>%
@@ -583,8 +566,7 @@ Visualizamos lo anterior en la siguiente tabla:
 ### 1.1 Tabla de TOP 10 
 
 ```{r}
-library(dplyr)
-library(gt)
+
 
 # Crear tabla GT
 tabla_top_to_read <- books_to_read %>%
@@ -673,8 +655,6 @@ En conjunto, los resultados permiten concluir que los libros más añadidos a li
 El objetivo de este análisis es identificar qué autores concentran la mayor cantidad de títulos dentro del subconjunto books_to_read. Esto permite observar si el interés lector se organiza en torno a autores “de culto” o sagas reconocidas, más que a géneros o temáticas específicas.
 
 ```{r}
-library(ggplot2)
-library(dplyr)
 
 # Calcular los autores más frecuentes
 authors_freq <- books_to_read %>%
@@ -730,9 +710,8 @@ El siguiente gráfico presenta la relación entre la valoración promedio (`avg_
 Cada punto representa un libro, mientras que la línea naranja de regresión muestra la tendencia general según un modelo lineal.
 
 ```{r}
-library(ggplot2)
 
-grafico_relacion_popularidad <- ggplot(books_to_read, aes(x = avg_rating, y = n_to_read)) +
+grafico_relacion_popularidad <- ggplot(books_to_read, aes(x =  avg_rating, y = n_to_read)) +
   geom_point(alpha = 0.6, color = "#0B5345", size = 3) +
   geom_smooth(method = "lm", color = "#E67E22", linewidth = 1.2, se = TRUE) +
   labs(
@@ -758,6 +737,63 @@ ggsave("../Outputs/grafico_relacion_popularidad.png",
        grafico_relacion_popularidad,
        width = 9, height = 6, dpi = 300)
 
+```
+
+```{r}
+summary(books_to_read$n_to_read)
+```
+
+```{r}
+books_to_read_median <- books_to_read |> 
+  filter(n_to_read > 21 & n_to_read < 95)
+```
+
+```{r}
+ggplot(books_to_read_median, aes(x =  avg_rating, y = n_to_read)) +
+  geom_point(alpha = 0.6, color = "#0B5345", size = 3) +
+  geom_smooth(method = "lm", color = "#E67E22", linewidth = 1.2, se = TRUE) +
+  labs(
+    title = "Relación entre valoración promedio y popularidad anticipada",
+    subtitle = "Cada punto representa un libro con registro completo en Goodreads",
+    x = "Promedio de valoración (avg_rating)",
+    y = "Usuarios que marcaron 'por leer'",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", color = "#2C2C2C", size = 14),
+    plot.subtitle = element_text(color = "gray30"),
+    axis.text = element_text(color = "#2C2C2C"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(size = 8, color = "gray40", face = "italic")
+  )
+```
+
+
+```{r}
+books_to_read_max <- books_to_read |> 
+  filter(n_to_read > 95)
+```
+
+```{r}
+ggplot(books_to_read_max, aes(x =  avg_rating, y = n_to_read)) +
+  geom_point(alpha = 0.6, color = "#0B5345", size = 3) +
+  geom_smooth(method = "lm", color = "#E67E22", linewidth = 1.2, se = TRUE) +
+  labs(
+    title = "Relación entre valoración promedio y popularidad anticipada",
+    subtitle = "Cada punto representa un libro con registro completo en Goodreads",
+    x = "Promedio de valoración (avg_rating)",
+    y = "Usuarios que marcaron 'por leer'",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", color = "#2C2C2C", size = 14),
+    plot.subtitle = element_text(color = "gray30"),
+    axis.text = element_text(color = "#2C2C2C"),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(size = 8, color = "gray40", face = "italic")
+  )
 ```
 
 El gráfico evidencia una relación positiva débil entre el promedio de valoración de los libros y el número de usuarios que los marcan como “por leer”. La pendiente apenas ascendente de la línea de tendencia sugiere que, en general, los títulos con mejores calificaciones tienden a atraer a más lectores potenciales, aunque la asociación no es lineal ni particularmente fuerte.
@@ -808,8 +844,6 @@ Esto refuerza la idea de que el interés por leer un libro no depende solo de su
 Cada hexágono representa un conjunto de libros agrupados por niveles similares de valoración promedio (`avg_rating`) y de usuarios que los marcaron como “por leer”. La intensidad del color indica la cantidad de títulos en cada rango.
 
 ```{r}
-library(ggplot2)
-library(hexbin)
 
 grafico_densidad <- ggplot(books_to_read, aes(x = avg_rating, y = n_to_read)) +
   geom_hex(bins = 30) +
@@ -867,16 +901,18 @@ Con el fin de complementar el análisis anterior, este apartado explora la distr
 
 ```{r}
 winner_takes_all <- ggplot(books_to_read, aes(x = n_to_read)) +
-geom_histogram(bins = 30, fill = "#5f0f40", color = "white") +
-scale_x_log10() +
-labs(
-title = "Distribución de 'n_to_read' (escala logarítmica)",
-subtitle = "La mayoría de los libros tiene pocos usuarios interesados, mientras unos pocos concentran gran atención",
-x = "Usuarios que marcaron 'por leer' (log10)",
-y = "Frecuencia de títulos",
-caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
-) +
-theme_minimal(base_size = 12)
+  geom_histogram(bins = 30,
+                 fill = "#5f0f40",
+                 color = "white") +
+  scale_x_log10() +
+  labs(
+    title = "Distribución de 'n_to_read' (escala logarítmica)",
+    subtitle = "La mayoría de los libros tiene pocos usuarios interesados, mientras unos pocos concentran gran atención",
+    x = "Usuarios que marcaron 'por leer' (log10)",
+    y = "Frecuencia de títulos",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Visualización: Valentina Tesser"
+  ) +
+  theme_minimal(base_size = 12)
 
 winner_takes_all
 
