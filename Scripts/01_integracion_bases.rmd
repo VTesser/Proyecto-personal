@@ -22,6 +22,9 @@ Esta etapa prepara la base final para análisis exploratorio
 library(dplyr)
 library(readr)
 library(tidyr)
+
+source("../R/99-funciones.R")
+options(digits = 5)
 ```
 
 # 2. Cargar las bases limpias
@@ -48,6 +51,15 @@ tags <- read_csv("Data Limpia/tags_clean.csv")
 to_read <- read_csv("Data Limpia/to_read_clean.csv")
 
 ```
+
+Recomendación
+
+```{r}
+carga_bases_multiples("../Data Limpia", 
+                      pattern = "\\_clean.csv$", 
+                      reader = readr::read_csv)
+```
+
 
 # 3. Estandarizar nombres de columnas (IDs)
 
@@ -197,7 +209,7 @@ sapply(books_full, function(x) sum(is.na(x)))
 # 12. Guardar base final integrada
 
 ```{r}
-write_csv(books_full, "Data Limpia/books_final_integrated.csv")
+write_csv(books_full, "Input/books_final_integrated.csv")
 ```
 
 
