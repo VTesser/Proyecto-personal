@@ -169,8 +169,8 @@ sum(duplicated(book_tags))   # 6 duplicados (revisar)
 sum(duplicated(to_read))
 
 ```
-Recomendación:
 
+Recomendación:
 
 ```{r}
 goodreads_bases <- c("book_tags", "books", "ratings", "tags", "to_read")

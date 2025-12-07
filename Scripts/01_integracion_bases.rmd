@@ -137,7 +137,6 @@ top_tags_per_book <- book_tags_joined %>%
 
 # 7. Unir tags a la base principal de libros
 
-
 ```{r}
 # Ahora cada libro tiene su género principal (tag_name)
 books_genres <- books %>%
@@ -146,7 +145,7 @@ books_genres <- books %>%
 # Comprobación: cuántos libros tienen tag asignado
 table(is.na(books_genres$tag_name))
 
-# Observación :FALSE 8130, esto significa que todos los libros en books tienen un tag asignado
+# Observación:FALSE 8130, esto significa que todos los libros en books tienen un tag asignado
 
 ```
 
