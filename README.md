@@ -7,7 +7,7 @@ editor_options:
 # Explorando el dataset Goodbooks-10k 📚
 
 -   Autor: Valentina Tesser
--   Fecha última actualización: 13 de noviembre de 2025
+-   Fecha última actualización: 7 de diciembre de 2025
 
 <details>
   <summary><strong>1. Introducción</strong></summary>
