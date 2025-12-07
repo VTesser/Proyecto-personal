@@ -9,6 +9,9 @@ editor_options:
 -   Autor: Valentina Tesser
 -   Fecha última actualización: 13 de noviembre de 2025
 
+<details>
+  <summary><strong>1. Introducción</strong></summary>
+  
 ## 1. Introducción
 
 ¿Alguna vez te has preguntado qué tipo de libros son los más populares o cuáles son los que más personas tienen pendientes de leer?
@@ -37,6 +40,11 @@ Todo el proceso se explica en detalle para que puedas reproducirlo y adaptar las
 En definitiva, este análisis busca demostrar cómo los datos pueden convertirse en una herramienta poderosa para observar el mundo cultural.
 A través de Goodreads, podemos entender no solo qué leen las personas, sino también qué **desean leer**, y cómo esas elecciones van moldeando el paisaje literario de una comunidad global interconectada por el amor a los libros.
 
+</details>
+
+<details>
+  <summary><strong>2. Estructura del proyecto</strong></summary>
+
 ## 2. Estructura del proyecto
 
 Este proyecto se organiza en distintas fases que reflejan el flujo típico de un **análisis de datos en R**, desde la obtención de la información hasta la comunicación de los resultados.
@@ -60,6 +68,11 @@ El repositorio está estructurado de la siguiente manera: - **Data**: Carpeta qu
 - **Data Limpia**: Carpeta donde se guardan las bases de datos ya limpias y listas para el análisis.
 - **Outputs**: Carpeta donde se guardan las visualizaciones y resultados generados durante el análisis.
 - **README.md**: Este archivo, que proporciona una visión general del proyecto y su estructura
+
+</details>
+
+<details>
+  <summary><strong>3. Base de datos</strong></summary>
 
 ## 3. Base de datos
 
@@ -111,14 +124,18 @@ Todos los pasos de limpieza e integración están documentados en los scripts de
 
 Esta fase asegura que el análisis posterior y las visualizaciones se realicen sobre un dataset **consistente, integrado y representativo**, facilitando la exploración de patrones de popularidad, valoración y preferencias lectoras en Goodreads.
 
+</details>
+
+<details>
+  <summary><strong>4. Pasos a seguir</strong></summary>
+
 ## 4. Pasos a seguir
 
-Para reproducir el análisis presentado en este proyecto, sigue estos pasos: 1.
-Clona o descarga este repositorio en tu computadora.
-2.
-Asegúrate de tener R y RStudio instalados.
-3.
-Instala las librerías necesarias si aún no las tienes:
+Para reproducir el análisis presentado en este proyecto, sigue estos pasos: 
+
+1. Clona o descarga este repositorio en tu computadora.
+2. Asegúrate de tener R y RStudio instalados.
+3. Instala las librerías necesarias si aún no las tienes:
 
 ```{r}
 install.packages(c(
@@ -147,7 +164,12 @@ No dudes en modificar el código para adaptarlo a tus propias preguntas de inves
 ¡Feliz análisis de datos!
 📊📚
 
-## 5.Explorando la relación entre valoración y popularidad en Goodreads 📖
+</details>
+
+<details>
+  <summary><strong>5.Explorando la relación entre valoración y popularidad en Goodreads</strong></summary>
+
+## 5.Explorando la relación entre valoración y popularidad en Goodreads
 
 Una de las preguntas más interesantes que surgen al analizar el dataset *Goodbooks-10k* es: **¿Qué relación existe entre la valoración promedio de un libro y su nivel de popularidad entre los usuarios?**
 
@@ -469,11 +491,16 @@ En síntesis, los libros que concentran mayor interés potencial en Goodreads co
 Este conjunto de hallazgos sugiere que en Goodreads, como en otros ecosistemas digitales, la popularidad anticipada responde más a dinámicas de visibilidad, reputación y consumo cultural compartido que a juicios estrictamente literarios.
 En consecuencia, la plataforma refleja no solo preferencias de lectura, sino también procesos sociales de reconocimiento, legitimación y pertenencia simbólica dentro de una comunidad global de lectores.
 
-## 6. Entre géneros y tendencias lectoras en Goodreads 🌍
+</details>
+
+<details>
+  <summary><strong>6. Entre géneros y tendencias lectoras en Goodreads</strong></summary>
+
+## 6. Entre géneros y tendencias lectoras en Goodreads
 
 Una de las preguntas más sugerentes al explorar el dataset *Goodbooks-10k* es: **¿Qué géneros literarios concentran el mayor interés entre los lectores, y cómo se distribuyen dentro del catálogo?**
 
-### 6.2 Objetivo analítico
+### 6.1 Objetivo analítico
 
 El objetivo es visualizar la **distribución de los principales géneros literarios** en Goodreads, observando qué temáticas acumulan más títulos y cómo se posicionan dentro del interés lector general.
 
@@ -481,10 +508,10 @@ A través de esta exploración, se pretende comprender las dinámicas de represe
 
 **Índice de visualizaciones:**
 
--   [6.3 Gráfico de distribución original](#63-gráfico-de-distribución-original)
--   [6.4 Gráfico de distribución con nuevo dataset (filtrado)](#64-gráfico-de-distribución-con-nuevo-dataset-filtrado)
+-   [6.2 Gráfico de distribución original](#63-gráfico-de-distribución-original)
+-   [6.3 Gráfico de distribución con nuevo dataset (filtrado)](#64-gráfico-de-distribución-con-nuevo-dataset-filtrado)
 
-### 6.3 Grafico de distribución original
+### 6.2 Grafico de distribución original
 
 Con este gráfico se busca observar la composición general del dataset original, es decir, cómo se distribuyen los libros según sus géneros sin aplicar ningún filtro sobre las valoraciones (`avg_rating`).
 
@@ -494,7 +521,7 @@ De esta forma, se pueden identificar patrones de sobre-representación o ausenci
 El análisis parte de la premisa de que Goodreads, como comunidad digital, refleja preferencias culturales colectivas, pero también las distorsiona según la popularidad, la traducción de obras o la disponibilidad de ciertos títulos en inglés.
 Por ello, mantener inicialmente todos los registros —incluso aquellos sin calificaciones— permite captar el “universo total” del catálogo.
 
-#### 6.3.1 Limpieza y depuración de datos
+#### 6.2.1 Limpieza y depuración de datos
 
 La limpieza de datos es una etapa fundamental para asegurar la validez del análisis.
 En el dataset Goodbooks-10k, los libros están asociados a múltiples etiquetas (tags) asignadas por los usuarios, lo que genera redundancia y ruido semántico.
@@ -560,7 +587,7 @@ books_genres_original <- books_genres_original %>%
   )
 ```
 
-#### 6.3.2 Visualización del gráfico
+#### 6.2.2 Visualización del gráfico
 
 Una vez limpiados los datos, se calcula la frecuencia de aparición de cada género y se seleccionan los 10 más frecuentes.
 El gráfico de barras resultante permite observar de forma clara qué tipos de literatura dominan el dataset original.
@@ -607,7 +634,7 @@ ggplot(top_genres_original, aes(x = reorder(genre_label, n), y = n)) +
 
 ![Top 15 libros más populares](Outputs/grafico_p2_1.png)
 
-### 6.4 Gráfico de distribucion con nuevo dataset
+### 6.3 Gráfico de distribucion con nuevo dataset
 
 El segundo gráfico introduce una comparación respecto al anterior, aplicando un filtro analítico para conservar únicamente los libros con una valoración promedio (`avg_rating`) disponible.
 Esta decisión metodológica tiene un propósito específico: evaluar cómo la ausencia de calificaciones afecta la diversidad de géneros observada.
@@ -617,7 +644,7 @@ Por tanto, trabajar con el dataset filtrado permite centrarse en las obras que e
 
 En esta versión, se vuelve a realizar un proceso de limpieza y recodificación de etiquetas, similar al anterior, pero ajustado a las nuevas condiciones del conjunto de datos.
 
-#### 6.4.1 Filtrar libros con datos válidos de género y valoración
+#### 6.3.1 Filtrar libros con datos válidos de género y valoración
 
 Filtrar por registros con calificación promedio y etiquetas válidas garantiza que los géneros analizados representen libros efectivamente leídos o reseñados, en lugar de simples intenciones de lectura.
 Este criterio busca mejorar la robustez interpretativa del análisis, al centrarse en el comportamiento observable de la comunidad lectora.
@@ -639,7 +666,7 @@ Al revisar la distribución, se observa que el campo `avg_rating` contiene 7474 
 
 De los géneros disponibles, varios corresponden a etiquetas no literarias (“to-read”, “favorites”) o autores individuales (“paulo-coelho”), por lo que deben eliminarse para evitar ruido en el análisis.
 
-#### 6.4.2 Limpieza de etiquetas y visualización final
+#### 6.3.2 Limpieza de etiquetas y visualización final
 
 Tras el filtrado, se vuelven a unificar etiquetas redundantes y se traducen las categorías más representativas al español.
 
@@ -715,7 +742,7 @@ ggplot(top_genres, aes(x = reorder(genre_label, n), y = n)) +
 
 ![Top 15 libros más populares](Outputs/grafico_p2_2.png)
 
-### 6.5 Comparación y conclusiones entre ambos gráficos
+### 6.4 Comparación y conclusiones entre ambos gráficos
 
 El primer gráfico, basado en el dataset original, ofrece una visión amplia del panorama literario en Goodbooks-10k.
 Allí se observa una marcada predominancia de la ficción y los clásicos (184 títulos), que constituyen el núcleo central de la colección.
@@ -736,7 +763,12 @@ La comparación entre la base original y la filtrada evidencia que la falta de c
 
 En conjunto, estos hallazgos sugieren que la base de datos —aunque útil para explorar patrones de lectura— tiende a reproducir las dinámicas de consumo cultural predominantes en la plataforma: una fuerte preferencia por la narrativa de ficción universal y un menor interés en géneros informativos o de nicho.
 
-## 7. Entre el deseo y la visibilidad: el mapa del interés lector en Goodreads ✨📖
+</details>
+
+<details>
+  <summary><strong>7. Entre el deseo y la visibilidad: el mapa del interés lector en Goodreads</strong></summary>
+
+## 7. Entre el deseo y la visibilidad: el mapa del interés lector en Goodreads
 
 En el ecosistema digital de Goodreads, no solo importan los libros que han sido leídos, sino también aquellos que los usuarios desean leer.
 Este análisis parte de una pregunta clave: **¿qué factores explican que ciertos títulos despierten una mayor expectativa lectora y sean añadidos con más frecuencia a las listas "to-read"?**
@@ -988,3 +1020,10 @@ En este contexto, la popularidad potencial —medida por el número de usuarios 
 En síntesis, los libros más marcados como “por leer” representan una intersección entre deseo, visibilidad y legitimidad cultural.
 Goodreads funciona así como un espejo del ecosistema editorial contemporáneo, donde las expectativas lectoras se moldean tanto por la curiosidad individual como por la fuerza de los circuitos de notoriedad colectiva.
 La anticipación del acto de leer se convierte en una práctica social en sí misma: una forma de participar en la cultura literaria global antes incluso de abrir un libro.
+
+</details>
+
+
+
+
+
