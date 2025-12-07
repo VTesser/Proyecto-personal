@@ -1023,7 +1023,9 @@ La anticipación del acto de leer se convierte en una práctica social en sí mi
 
 </details>
 
-
+<details>
+  <summary><strong>8. Entre géneros, firmas y décadas: trayectorias de valoración y reseñas en Goodreads</strong></summary>
+  
 ## 8. Entre géneros, firmas y décadas: trayectorias de valoración y reseñas en Goodreads
 
 La presente sección se estructura a partir de la siguiente pregunta de investigación: **¿cómo varían las calificaciones y reseñas según el género, el autor y el año de publicación?** A partir de esta interrogante, se analizan las dinámicas de valoración promedio, el volumen de calificaciones y la producción de reseñas textuales de los libros registrados en Goodreads, considerando tres dimensiones analíticas centrales: el género literario, el período de publicación y, de manera indirecta, la autoría.
@@ -1189,4 +1191,14 @@ Finalmente, respecto del autor, los resultados indican que aquellos con trayecto
 
 En conjunto, estos hallazgos muestran que las calificaciones y reseñas en Goodreads responden a una combinación de factores estructurales y culturales, donde el género y el contexto temporal condicionan fuertemente los niveles de interacción, mientras que el autor actúa como un amplificador de visibilidad más que como un determinante directo de la valoración.
 
+</details>
+
+<details>
+  <summary><strong>9. Cierre de la investigación</strong></summary>
+  
+## 9. Cierre de la investigación
+
+
+
+</details>
 
