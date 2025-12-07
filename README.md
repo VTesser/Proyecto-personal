@@ -1024,6 +1024,169 @@ La anticipación del acto de leer se convierte en una práctica social en sí mi
 </details>
 
 
+## 8. Entre géneros, firmas y décadas: trayectorias de valoración y reseñas en Goodreads
 
+La presente sección se estructura a partir de la siguiente pregunta de investigación: **¿cómo varían las calificaciones y reseñas según el género, el autor y el año de publicación?** A partir de esta interrogante, se analizan las dinámicas de valoración promedio, el volumen de calificaciones y la producción de reseñas textuales de los libros registrados en Goodreads, considerando tres dimensiones analíticas centrales: el género literario, el período de publicación y, de manera indirecta, la autoría.
+
+A diferencia de los análisis previos, centrados en la exploración de variables individuales, el énfasis aquí está puesto en identificar patrones comparativos e interrelaciones entre estas dimensiones, utilizando la base consolidada `books_full`. Este enfoque permite observar cómo se combinan factores estructurales del campo editorial —como la pertenencia genérica y la trayectoria temporal de las obras— con elementos simbólicos asociados a la visibilidad y posicionamiento de los autores dentro de la plataforma.
+
+El objetivo no es únicamente establecer qué libros reciben mejores evaluaciones, sino también comprender cómo varía la intensidad de la interacción lectora, medida tanto por las calificaciones como por las reseñas textuales, y cómo estas formas de participación se distribuyen de manera diferencial según género, firma autoral y contexto temporal.
+
+### 8.1 Síntesis descriptiva: género y período de publicación
+
+Para este análisis se utiliza el objeto `books_genres_original`, ya que incorpora las etiquetas de género previamente depuradas y agrupadas en la Pregunta 2, lo que permite una lectura comparativa más consistente. Antes de construir la tabla descriptiva, fue necesario realizar un proceso adicional de limpieza y estandarización de los géneros, dado que el dataset original presenta una alta fragmentación semántica: múltiples etiquetas para un mismo tipo de obra (por ejemplo, “classic” y “classics”), así como categorías que no corresponden estrictamente a géneros literarios (como “book-club” o “library”).
+
+Con el fin de asegurar coherencia analítica, se aplicó un proceso de unificación semántica mediante `case_when()`, que permitió reagrupar etiquetas equivalentes bajo un mismo género principal y excluir aquellas categorías que no aportan al análisis sustantivo. Esta depuración resulta fundamental para evitar la dispersión artificial de los datos y garantizar que las comparaciones entre géneros y períodos de publicación reflejen diferencias reales en las prácticas de valoración y reseña, y no inconsistencias del etiquetado original.
+
+```{r}
+library(dplyr)
+
+tabla_pregunta4 <- books_genres_original %>%
+mutate(
+periodo_publicacion = case_when(
+original_publication_year < 1990 ~ "Antes de 1990",
+original_publication_year >= 1990 & original_publication_year < 2005 ~ "1990–2004",
+original_publication_year >= 2005 & original_publication_year < 2015 ~ "2005–2014",
+original_publication_year >= 2015 ~ "2015–2017"
+)) %>%
+  
+group_by(genre_label, periodo_publicacion) %>%
+summarise(
+promedio_rating = mean(average_rating, na.rm = TRUE),
+mediana_ratings = median(ratings_count, na.rm = TRUE),
+mediana_reviews = median(work_text_reviews_count, na.rm = TRUE),
+mediana_to_read = median(n_to_read, na.rm = TRUE),
+n_libros = n(),
+.groups = "drop") %>%
+  
+arrange(desc(mediana_ratings))
+```
+![Vista previa del gráfico](Outputs/tabla_pregunta4_gt.png)
+
+La tabla presenta una caracterización comparativa de los libros más populares en Goodreads según género principal y período de publicación, incorporando indicadores centrales de recepción lectora: valoración promedio, volumen de calificaciones, número de reseñas textuales y registros en la lista “por leer”.
+
+En términos generales, los resultados evidencian que la popularidad de los libros no responde únicamente a su calidad percibida, medida a través del promedio de rating, sino que se articula de manera compleja con el momento histórico de publicación y el género literario. Los libros publicados antes de 1990 concentran, en varios géneros clásicos —como Ficción / Clásicos, Ciencia ficción y Infantil— medianas de calificaciones y reseñas considerablemente altas, lo que sugiere un efecto de acumulación temporal y canonización literaria.
+
+Durante el período 1990–2004, se observa una diversificación en los géneros con altos niveles de participación, destacando No ficción, Viajes y Novela gráfica / Cómic. Este patrón podría vincularse con la expansión editorial de finales del siglo XX y con un crecimiento progresivo de comunidades lectoras en línea. En los períodos más recientes (2005–2014 y 2015–2017), si bien algunos géneros presentan valoraciones promedio elevadas, el número de libros por categoría tiende a ser menor y los indicadores de popularidad muestran mayor heterogeneidad, lo que sugiere una competencia más intensa por la atención de los lectores.
+
+En conjunto, la tabla permite concluir que la popularidad en Goodreads es un fenómeno estratificado temporal y genéricamente, donde los géneros consolidados y los libros con mayor trayectoria histórica mantienen ventajas estructurales en términos de visibilidad y participación.
+
+### 8.2 Género principal y volumen de calificaciones
+
+Con el fin de profundizar en cómo varía la intensidad de la interacción lectora según el tipo de obra, este apartado analiza la distribución del número de calificaciones por género principal. A diferencia del promedio de ratings, que refleja la evaluación simbólica de la obra, el volumen de calificaciones permite aproximarse al nivel de visibilidad y masividad de cada género dentro de Goodreads, capturando cuántos lectores efectivamente interactúan con los libros a través de la plataforma.
+
+Para ello, se opta por un gráfico de caja y bigotes (boxplot), ya que este tipo de visualización permite comparar no solo las medianas entre géneros, sino también la dispersión, asimetría y presencia de valores extremos, aspectos centrales en un contexto donde la popularidad de los libros tiende a estar altamente concentrada en pocos títulos. Dado que el número de calificaciones presenta una distribución fuertemente sesgada a la derecha —con obras excepcionalmente populares—, se utiliza una escala logarítmica en el eje vertical, lo que facilita la comparación entre géneros sin que los casos más masivos opaquen el comportamiento general del resto.
+
+Este enfoque permite identificar diferencias estructurales entre géneros con públicos amplios y transversales, como la ficción popular o la no ficción, y otros con audiencias más acotadas, ofreciendo así una base empírica para interpretar posteriormente cómo el género condiciona la visibilidad, recepción y circulación de los libros en Goodreads.
+
+```{r}
+library(ggplot2)
+library(viridis)
+
+ggplot_p4 <- ggplot(
+  books_genres_original,
+  aes(x = genre_label, y = ratings_count, fill = genre_label)
+) +
+  geom_boxplot(
+    outlier.alpha = 0.2,
+    linewidth = 0.4,
+    show.legend = FALSE
+  ) +
+  scale_y_log10(labels = scales::comma_format()) +
+  scale_fill_viridis(discrete = TRUE, option = "C") +
+  labs(
+    title = "Distribución del número de calificaciones por género principal",
+    subtitle = "Escala logarítmica del volumen de ratings en Goodreads",
+    x = "Género principal",
+    y = "Número de calificaciones",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Elaboración: Valentina Tesser"
+  ) +
+  theme_minimal(base_family = "Helvetica") +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 11, margin = margin(b = 10)),
+    plot.caption = element_text(size = 9, hjust = 0, margin = margin(t = 10)),
+    axis.title = element_text(size = 11),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 9),
+    axis.text.y = element_text(size = 9),
+    panel.grid.minor = element_blank()
+  )
+```
+![Vista previa del gráfico](Outputs/ggplot_p4.png)
+
+El gráfico de cajas muestra la distribución del número de calificaciones por género, utilizando una escala logarítmica que permite visualizar adecuadamente la alta dispersión de los datos. Se observa una marcada asimetría en la distribución, con presencia de valores extremos en prácticamente todos los géneros, lo que confirma que unos pocos títulos concentran una porción significativa de las interacciones.
+
+Géneros como Ficción / Clásicos, Juvenil, Infantil y Fantasía presentan medianas más elevadas y rangos intercuartílicos amplios, lo que indica no solo una alta popularidad promedio, sino también una fuerte desigualdad interna entre libros altamente exitosos y otros con menor recepción. En contraste, géneros como Poesía, Teatro o Biografía / Memorias muestran distribuciones más compactas, con menores volúmenes de calificaciones, sugiriendo nichos lectorales más acotados.
+
+Este gráfico refuerza la idea de que la popularidad en Goodreads está fuertemente condicionada por el tipo de género, y que ciertos géneros comerciales o asociados a audiencias juveniles concentran una mayor actividad participativa, independientemente de la valoración promedio.
+
+### 8.3 Año de publicación y número de reseñas textuales
+
+Este apartado explora la relación entre el año de publicación de los libros y el número de reseñas textuales generadas por los lectores en Goodreads, con el objetivo de identificar patrones temporales en la participación discursiva de los usuarios. A diferencia de las calificaciones numéricas, las reseñas escritas implican un mayor nivel de involucramiento, por lo que constituyen un indicador más exigente de interacción activa y reflexiva con las obras.
+
+La decisión de analizar esta relación responde a la hipótesis de que la producción de reseñas no depende únicamente de la calidad percibida del libro, sino también de factores contextuales como la antigüedad de la obra, su circulación reciente, las dinámicas de consumo digital y los cambios en las prácticas de lectura y comentario a lo largo del tiempo. En este sentido, resulta relevante observar si los libros más recientes concentran una mayor actividad discursiva, o si las obras clásicas mantienen niveles sostenidos de reseñas gracias a su canonización y uso recurrente en espacios educativos.
+
+Para visualizar esta relación se utiliza un gráfico de dispersión, adecuado para representar la asociación entre dos variables continuas, complementado con una curva suavizada (LOESS) que permite identificar tendencias generales sin imponer una forma funcional rígida. Dado que el número de reseñas presenta una distribución altamente sesgada, se aplica una escala logarítmica en el eje vertical, facilitando la lectura del patrón general y evitando que los títulos con una cantidad excepcionalmente alta de reseñas dominen la visualización.
+
+Este enfoque permite captar tanto la heterogeneidad individual de los libros como las tendencias agregadas a lo largo del tiempo, proporcionando evidencia para interpretar cómo el momento histórico de publicación condiciona la visibilidad discursiva y el tipo de interacción que los lectores establecen con las obras en la plataforma.
+
+```{r}
+library(ggplot2)
+library(viridis)
+
+ggplot_p5 <- ggplot(
+  books_full,
+  aes(x = original_publication_year, y = work_text_reviews_count)
+) +
+  geom_point(
+    alpha = 0.25,
+    size = 1,
+    color = "#4C72B0"
+  ) +
+  geom_smooth(
+    method = "loess",
+    se = FALSE,
+    color = "#DD8452",
+    linewidth = 1
+  ) +
+  scale_y_log10(
+    labels = scales::comma_format()
+  ) +
+  labs(
+    title = "Relación entre año de publicación y número de reseñas textuales",
+    subtitle = "Evolución del nivel de interacción lectora en Goodreads",
+    x = "Año de publicación",
+    y = "Número de reseñas (escala logarítmica)",
+    caption = "Fuente: Dataset Goodbooks-10k (Kaggle) | Elaboración: Valentina Tesser"
+  ) +
+  theme_minimal(base_family = "Helvetica") +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 11, margin = margin(b = 10)),
+    plot.caption = element_text(size = 9, hjust = 0, margin = margin(t = 10)),
+    axis.title = element_text(size = 11),
+    axis.text = element_text(size = 9),
+    panel.grid.minor = element_blank()
+  )
+```
+![Vista previa del gráfico](Outputs/ggplot_p5.png)
+
+El gráfico de dispersión revela la relación entre el año de publicación y el número de reseñas textuales, nuevamente en escala logarítmica. La tendencia suavizada mediante LOESS muestra un patrón claro: los libros publicados en décadas recientes presentan, en promedio, un mayor número de reseñas, especialmente a partir de los años 2000.
+
+Este comportamiento sugiere un cambio estructural en las prácticas de lectura y participación, asociado a la consolidación de plataformas digitales como Goodreads, donde la escritura de reseñas se vuelve parte central de la experiencia lectora. Los libros más antiguos, aun cuando mantienen niveles relevantes de interacción, tienden a concentrar menos reseñas textuales, lo que puede explicarse tanto por una menor retroactividad en la plataforma como por diferencias generacionales en los hábitos de participación.
+
+La elevada dispersión observada para los libros más recientes indica, además, que no todos los títulos contemporáneos alcanzan altos niveles de interacción, lo que refuerza la idea de una competencia por visibilidad creciente en el mercado editorial digital.
+
+### 8.4 Cierre pregunta 4
+
+Las calificaciones y reseñas en Goodreads varían de manera sistemática según el género literario, el año de publicación y, en menor medida, según el autor, reflejando tanto diferencias en las preferencias lectoras como dinámicas propias de la circulación cultural en plataformas digitales.
+
+En primer lugar, el género emerge como un factor central. Géneros ampliamente consolidados y de alto consumo —como Ficción / Clásicos, Fantasía, Juvenil e Infantil— concentran mayores volúmenes de calificaciones y reseñas, además de mostrar una dispersión elevada, lo que indica que coexisten títulos extremadamente populares con otros de recepción más acotada. En contraste, géneros como Poesía, Teatro o Biografía / Memorias presentan menores niveles de interacción, sugiriendo públicos más especializados y nichos lectorales reducidos. No obstante, las valoraciones promedio entre géneros tienden a ser relativamente similares, lo que refuerza la idea de que la cantidad de interacciones no equivale necesariamente a una mayor evaluación positiva.
+
+En segundo lugar, el año de publicación introduce un componente temporal clave. Los libros publicados antes de 1990 tienden a acumular un mayor número total de calificaciones, resultado de una exposición prolongada en el tiempo y de procesos de canonización literaria. Por su parte, los libros más recientes muestran una mayor intensidad de reseñas textuales, especialmente a partir de la década de 2000, lo que sugiere cambios en las prácticas lectoras asociadas a la masificación de plataformas digitales y a la creciente participación de los usuarios en la producción de contenido.
+
+Finalmente, respecto del autor, los resultados indican que aquellos con trayectorias consolidadas o con múltiples obras presentes en la plataforma concentran mayores niveles de calificaciones y reseñas, independientemente del género o del período de publicación. Sin embargo, esta influencia se manifiesta principalmente en el volumen de interacciones y no necesariamente en las valoraciones promedio, lo que indica que el reconocimiento autoral incrementa la visibilidad y participación, pero no garantiza evaluaciones más altas.
+
+En conjunto, estos hallazgos muestran que las calificaciones y reseñas en Goodreads responden a una combinación de factores estructurales y culturales, donde el género y el contexto temporal condicionan fuertemente los niveles de interacción, mientras que el autor actúa como un amplificador de visibilidad más que como un determinante directo de la valoración.
 
 
