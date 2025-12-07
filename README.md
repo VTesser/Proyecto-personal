@@ -481,7 +481,7 @@ A través de esta exploración, se pretende comprender las dinámicas de represe
 
 **Índice de visualizaciones:**
 
--   [6.3 Gráfico de distribución original](#63-gráfico-de-distribución-original)\
+-   [6.3 Gráfico de distribución original](#63-gráfico-de-distribución-original)
 -   [6.4 Gráfico de distribución con nuevo dataset (filtrado)](#64-gráfico-de-distribución-con-nuevo-dataset-filtrado)
 
 ### 6.3 Grafico de distribución original
