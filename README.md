@@ -1032,9 +1032,17 @@ La presente sección se estructura a partir de la siguiente pregunta de investig
 
 A diferencia de los análisis previos, centrados en la exploración de variables individuales, el énfasis aquí está puesto en identificar patrones comparativos e interrelaciones entre estas dimensiones, utilizando la base consolidada `books_full`. Este enfoque permite observar cómo se combinan factores estructurales del campo editorial —como la pertenencia genérica y la trayectoria temporal de las obras— con elementos simbólicos asociados a la visibilidad y posicionamiento de los autores dentro de la plataforma.
 
-El objetivo no es únicamente establecer qué libros reciben mejores evaluaciones, sino también comprender cómo varía la intensidad de la interacción lectora, medida tanto por las calificaciones como por las reseñas textuales, y cómo estas formas de participación se distribuyen de manera diferencial según género, firma autoral y contexto temporal.
+### 8.1 Objetivo analítico
 
-### 8.1 Síntesis descriptiva: género y período de publicación
+El objetivo no es únicamente establecer qué libros reciben mejores evaluaciones, sino también comprender cómo varía la intensidad de la interacción lectora, medida tanto por las calificaciones como por las reseñas textuales, y cómo estas formas de participación se distribuyen de manera diferencial según género, firma autoral y contexto temporal
+
+**Índice de visualizaciones:**
+
+- [8.2 Síntesis descriptiva: género y período de publicación](#82-sintesis-descriptiva-genero-y-periodo-de-publicacion)
+- [8.3 Género principal y volumen de calificaciones](#83-genero-principal-y-volumen-de-calificaciones)
+- [8.4 Año de publicación y número de reseñas textuales](#84-ano-de-publicacion-y-numero-de-resenas-textuales)
+
+### 8.2 Síntesis descriptiva: género y período de publicación
 
 Para este análisis se utiliza el objeto `books_genres_original`, ya que incorpora las etiquetas de género previamente depuradas y agrupadas en la Pregunta 2, lo que permite una lectura comparativa más consistente. Antes de construir la tabla descriptiva, fue necesario realizar un proceso adicional de limpieza y estandarización de los géneros, dado que el dataset original presenta una alta fragmentación semántica: múltiples etiquetas para un mismo tipo de obra (por ejemplo, “classic” y “classics”), así como categorías que no corresponden estrictamente a géneros literarios (como “book-club” o “library”).
 
@@ -1073,7 +1081,7 @@ Durante el período 1990–2004, se observa una diversificación en los géneros
 
 En conjunto, la tabla permite concluir que la popularidad en Goodreads es un fenómeno estratificado temporal y genéricamente, donde los géneros consolidados y los libros con mayor trayectoria histórica mantienen ventajas estructurales en términos de visibilidad y participación.
 
-### 8.2 Género principal y volumen de calificaciones
+### 8.3 Género principal y volumen de calificaciones
 
 Con el fin de profundizar en cómo varía la intensidad de la interacción lectora según el tipo de obra, este apartado analiza la distribución del número de calificaciones por género principal. A diferencia del promedio de ratings, que refleja la evaluación simbólica de la obra, el volumen de calificaciones permite aproximarse al nivel de visibilidad y masividad de cada género dentro de Goodreads, capturando cuántos lectores efectivamente interactúan con los libros a través de la plataforma.
 
@@ -1122,7 +1130,7 @@ Géneros como Ficción / Clásicos, Juvenil, Infantil y Fantasía presentan medi
 
 Este gráfico refuerza la idea de que la popularidad en Goodreads está fuertemente condicionada por el tipo de género, y que ciertos géneros comerciales o asociados a audiencias juveniles concentran una mayor actividad participativa, independientemente de la valoración promedio.
 
-### 8.3 Año de publicación y número de reseñas textuales
+### 8.4 Año de publicación y número de reseñas textuales
 
 Este apartado explora la relación entre el año de publicación de los libros y el número de reseñas textuales generadas por los lectores en Goodreads, con el objetivo de identificar patrones temporales en la participación discursiva de los usuarios. A diferencia de las calificaciones numéricas, las reseñas escritas implican un mayor nivel de involucramiento, por lo que constituyen un indicador más exigente de interacción activa y reflexiva con las obras.
 
@@ -1179,7 +1187,7 @@ Este comportamiento sugiere un cambio estructural en las prácticas de lectura y
 
 La elevada dispersión observada para los libros más recientes indica, además, que no todos los títulos contemporáneos alcanzan altos niveles de interacción, lo que refuerza la idea de una competencia por visibilidad creciente en el mercado editorial digital.
 
-### 8.4 Cierre pregunta 4
+### 8.5 Cierre pregunta 4
 
 Las calificaciones y reseñas en Goodreads varían de manera sistemática según el género literario, el año de publicación y, en menor medida, según el autor, reflejando tanto diferencias en las preferencias lectoras como dinámicas propias de la circulación cultural en plataformas digitales.
 
